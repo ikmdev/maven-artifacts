@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-public class DatastoreProxy implements Closeable {la
+public class DatastoreProxy implements Closeable {
 
 
     public void start() {
