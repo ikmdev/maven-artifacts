@@ -27,7 +27,6 @@
         <module>tinkar-change-set-archetype</module>
         <module>tinkar-binding-archetype</module>
         <module>tinkar-data-archetype</module>
-        <module>datastore-proxy</module>
     </modules>
 
     <properties>

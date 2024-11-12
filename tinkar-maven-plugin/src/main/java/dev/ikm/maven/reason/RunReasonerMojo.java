@@ -15,10 +15,14 @@
  */
 package dev.ikm.maven.reason;
 
+import dev.ikm.maven.DatastoreProxy;
 import dev.ikm.tinkar.common.alert.AlertStreams;
 import dev.ikm.tinkar.common.id.IntIdSet;
 import dev.ikm.tinkar.common.id.IntIds;
+import dev.ikm.tinkar.common.service.CachingService;
 import dev.ikm.tinkar.common.service.PrimitiveData;
+import dev.ikm.tinkar.common.service.ServiceKeys;
+import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.common.sets.ConcurrentHashSet;
 import dev.ikm.tinkar.common.util.time.MultipleEndpointTimer;
 import dev.ikm.tinkar.common.util.uuid.UuidT5Generator;
@@ -39,6 +43,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
@@ -51,6 +56,9 @@ import org.jgrapht.alg.isomorphism.AHURootedTreeIsomorphismInspector;
 import org.jgrapht.alg.isomorphism.IsomorphicGraphMapping;
 import org.jgrapht.graph.DefaultEdge;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.OptionalInt;
@@ -59,8 +67,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Mojo(name = "run-full-reasoner", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class RunReasonerMojo extends AbstractMojo {
+
 	@Override
 	public void execute() throws MojoExecutionException {
+
+		try (DatastoreProxy datastoreProxy = new DatastoreProxy()) {
+			datastoreProxy.start();
+
+		} catch (Exception e){
+			throw new MojoExecutionException(e.getMessage(), e);
+		}
+
 //
 //		ReasonerService reasonerService = new ElkOwlReasonerService();
 //		//		ExtractElkOwlAxiomsTask extractTask = new ExtractElkOwlAxiomsTask(reasonerService);

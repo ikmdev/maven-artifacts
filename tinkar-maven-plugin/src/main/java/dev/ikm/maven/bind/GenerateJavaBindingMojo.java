@@ -18,8 +18,10 @@ package dev.ikm.maven.bind;
 import dev.ikm.maven.bind.config.CharacterReplacement;
 import dev.ikm.maven.bind.config.LanguageConfiguration;
 import dev.ikm.maven.bind.config.StampConfiguration;
-import dev.ikm.maven.datastore.proxy.DatastoreProxy;
+import dev.ikm.tinkar.common.service.CachingService;
 import dev.ikm.tinkar.common.service.PrimitiveData;
+import dev.ikm.tinkar.common.service.ServiceKeys;
+import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.coordinate.language.LanguageCoordinateRecord;
 import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculator;
 import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculatorWithCache;
@@ -38,6 +40,7 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -45,6 +48,9 @@ import java.util.stream.Stream;
 
 @Mojo(name = "generate-java-binding", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class GenerateJavaBindingMojo extends AbstractMojo {
+
+	@Parameter(name = "datastoreDirectory", defaultValue = "${project.build.directory}/datastore")
+	File datastoreDirectory;
 
 	@Parameter(name = "bindingOutputFile", required = true)
 	private File bindingOutputFile;
@@ -67,10 +73,32 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 	@Parameter(name = "languageConfigurations", required = true)
 	private List<LanguageConfiguration> languageConfigurations;
 
+	public void setup() throws IOException {
+		if (!datastoreDirectory.exists()) {
+			Files.createDirectories(datastoreDirectory.toPath());
+		}
+		CachingService.clearAll();
+		ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, datastoreDirectory);
+		PrimitiveData.selectControllerByName("Open SpinedArrayStore");
+		PrimitiveData.start();
+	}
+
+	public void teardown() {
+		PrimitiveData.stop();
+	}
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		try(DatastoreProxy datastoreProxy = new DatastoreProxy()) {
+		try {
+			if (!datastoreDirectory.exists()) {
+				Files.createDirectories(datastoreDirectory.toPath());
+			}
+			CachingService.clearAll();
+			ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, datastoreDirectory);
+			PrimitiveData.selectControllerByName("Open SpinedArrayStore");
+			PrimitiveData.start();
+
+
 			Stream.Builder<Entity<? extends EntityVersion>> conceptStreamBuilder = Stream.builder();
 			Stream.Builder<Entity<? extends EntityVersion>> patternStreamBuilder = Stream.builder();
 			PrimitiveData.get().forEachConceptNid(nid -> conceptStreamBuilder.add(EntityService.get().getEntityFast(nid)));
@@ -142,6 +170,8 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 				getLog().error(e);
 				throw new MojoExecutionException(e.getMessage(), e);
 			}
+
+			PrimitiveData.stop();
 		} catch (Exception e) {
 			getLog().error(e);
 			throw new MojoExecutionException(e.getMessage(), e);
