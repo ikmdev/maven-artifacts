@@ -133,11 +133,6 @@
                 <artifactId>reasoner-elk-snomed</artifactId>
                 <version>${tinkar-core.version}</version>
             </dependency>
-            <dependency>
-                <groupId>dev.ikm.maven</groupId>
-                <artifactId>datastore-proxy</artifactId>
-                <version>${project.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
