@@ -33,7 +33,7 @@ public class DatastoreProxy implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         PrimitiveData.stop();
     }
 }
