@@ -14,7 +14,7 @@ public class DatastoreProxy implements Closeable {
 
 
     public void start() {
-        File datastoreDirectory = new File(System.getProperty("project.build.directory"), "datastore");
+        File datastoreDirectory = new File(System.getProperty("user.home") + "/Solor/generated-data");
         start(datastoreDirectory);
     }
 

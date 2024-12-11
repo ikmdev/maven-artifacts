@@ -41,6 +41,7 @@ import org.eclipse.collections.api.list.MutableList;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -49,7 +50,7 @@ import java.util.stream.Stream;
 @Mojo(name = "generate-java-binding", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class GenerateJavaBindingMojo extends AbstractMojo {
 
-	@Parameter(name = "datastoreDirectory", defaultValue = "${project.build.directory}/datastore")
+	@Parameter(name = "datastoreDirectory", defaultValue = "${user.home}/Solor/generated-data")
 	File datastoreDirectory;
 
 	@Parameter(name = "bindingOutputFile", required = true)
@@ -68,24 +69,10 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 	private List<CharacterReplacement> characterReplacements;
 
 	@Parameter(name = "stampConfiguration", required = true)
-	private StampConfiguration stampConfiguration;
+	private String stampConfiguration;
 
 	@Parameter(name = "languageConfigurations", required = true)
-	private List<LanguageConfiguration> languageConfigurations;
-
-	public void setup() throws IOException {
-		if (!datastoreDirectory.exists()) {
-			Files.createDirectories(datastoreDirectory.toPath());
-		}
-		CachingService.clearAll();
-		ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, datastoreDirectory);
-		PrimitiveData.selectControllerByName("Open SpinedArrayStore");
-		PrimitiveData.start();
-	}
-
-	public void teardown() {
-		PrimitiveData.stop();
-	}
+	private List<String> languageConfigurations;
 
 	@Override
 	public void execute() throws MojoExecutionException {
@@ -129,6 +116,8 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 			}
 
 			try (DataOutputStream dataOutputStream = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(bindingOutputFile)))) {
+				StampConfiguration stampConfiguration = StampConfiguration.DEVELOPMENT_LATEST;
+				List<LanguageConfiguration> languageConfigurations = Arrays.asList(LanguageConfiguration.US_ENGLISH_FULLY_QUALIFIED_NAME, LanguageConfiguration.US_ENGLISH_REGULAR_NAME);
 				final StampCalculator stampCalculator = stampConfiguration.getStampCoordinateRecord().stampCalculator();
 				MutableList<LanguageCoordinateRecord> languageCoordinateRecords = Lists.mutable.empty();
 				languageConfigurations.stream().map(LanguageConfiguration::getLanguageCoordinateRecord).forEach(languageCoordinateRecords::add);
