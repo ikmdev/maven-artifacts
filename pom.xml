@@ -40,7 +40,7 @@
         <maven-archetype-packaging.version>3.1.1</maven-archetype-packaging.version>
         <commons-io.version>2.16.1</commons-io.version>
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
-        <tinkar-core.version>1.80.0</tinkar-core.version>
+        <tinkar-core.version>1.82.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
     </properties>
 

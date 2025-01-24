@@ -15,6 +15,7 @@
  */
 package dev.ikm.maven.bind;
 
+import dev.ikm.maven.DatastoreProxy;
 import dev.ikm.maven.bind.config.CharacterReplacement;
 import dev.ikm.maven.bind.config.LanguageConfiguration;
 import dev.ikm.maven.bind.config.StampConfiguration;
@@ -50,8 +51,8 @@ import java.util.stream.Stream;
 @Mojo(name = "generate-java-binding", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
 public class GenerateJavaBindingMojo extends AbstractMojo {
 
-	@Parameter(name = "datastoreDirectory", defaultValue = "${user.home}/Solor/generated-data")
-	File datastoreDirectory;
+	@Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
+	File dataStore;
 
 	@Parameter(name = "bindingOutputFile", required = true)
 	private File bindingOutputFile;
@@ -76,22 +77,13 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException {
-		try {
-			if (!datastoreDirectory.exists()) {
-				Files.createDirectories(datastoreDirectory.toPath());
-			}
-			CachingService.clearAll();
-			ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, datastoreDirectory);
-			PrimitiveData.selectControllerByName("Open SpinedArrayStore");
-			PrimitiveData.start();
-
-
+		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			Stream.Builder<Entity<? extends EntityVersion>> conceptStreamBuilder = Stream.builder();
 			Stream.Builder<Entity<? extends EntityVersion>> patternStreamBuilder = Stream.builder();
 			PrimitiveData.get().forEachConceptNid(nid -> conceptStreamBuilder.add(EntityService.get().getEntityFast(nid)));
 			PrimitiveData.get().forEachPatternNid(nid -> patternStreamBuilder.add(EntityService.get().getEntityFast(nid)));
 			String className = bindingOutputFile.toPath().getFileName().toString().replace(".java", "");
-			UUID namespaceUUID = null;
+			UUID namespaceUUID;
 
 			//Check for correctly formed class name based on java file name
 			if (className.contains(" ")) {
@@ -121,7 +113,6 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 				final StampCalculator stampCalculator = stampConfiguration.getStampCoordinateRecord().stampCalculator();
 				MutableList<LanguageCoordinateRecord> languageCoordinateRecords = Lists.mutable.empty();
 				languageConfigurations.stream().map(LanguageConfiguration::getLanguageCoordinateRecord).forEach(languageCoordinateRecords::add);
-
 
 				final LanguageCalculator languageCalculator = LanguageCalculatorWithCache.getCalculator(
 						stampConfiguration.getStampCoordinateRecord(),
@@ -159,8 +150,6 @@ public class GenerateJavaBindingMojo extends AbstractMojo {
 				getLog().error(e);
 				throw new MojoExecutionException(e.getMessage(), e);
 			}
-
-			PrimitiveData.stop();
 		} catch (Exception e) {
 			getLog().error(e);
 			throw new MojoExecutionException(e.getMessage(), e);

@@ -16,10 +16,6 @@
 package dev.ikm.maven.transform;
 
 import dev.ikm.maven.DatastoreProxy;
-import dev.ikm.tinkar.common.service.CachingService;
-import dev.ikm.tinkar.common.service.PrimitiveData;
-import dev.ikm.tinkar.common.service.ServiceKeys;
-import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.transaction.Transaction;
 import dev.ikm.tinkar.ext.lang.owl.Rf2OwlToLogicAxiomTransformer;
 import dev.ikm.tinkar.terms.TinkarTerm;
@@ -30,18 +26,21 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 @Mojo(name = "run-owl-transformer", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class RunOWLTransformerMojo extends AbstractMojo {
 
+	@Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
+	File dataStore;
+
 	@Override
 	public void execute() throws MojoExecutionException {
-		try (DatastoreProxy datastoreProxy = new DatastoreProxy()){
-			datastoreProxy.start();
+		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)){
 			Transaction owlTransformTransaction = new Transaction();
-			Rf2OwlToLogicAxiomTransformer rf2OwlToLogicAxiomTransformer = new Rf2OwlToLogicAxiomTransformer(owlTransformTransaction, TinkarTerm.OWL_AXIOM_SYNTAX_PATTERN, TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN);
+			Rf2OwlToLogicAxiomTransformer rf2OwlToLogicAxiomTransformer = new Rf2OwlToLogicAxiomTransformer(
+					owlTransformTransaction,
+					TinkarTerm.OWL_AXIOM_SYNTAX_PATTERN,
+					TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN);
 			rf2OwlToLogicAxiomTransformer.call();
 		} catch (Exception e) {
 			getLog().error(e);

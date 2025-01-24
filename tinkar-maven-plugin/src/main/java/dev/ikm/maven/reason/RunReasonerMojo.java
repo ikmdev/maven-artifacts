@@ -29,6 +29,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
@@ -37,15 +38,18 @@ import java.util.ServiceLoader;
 public class RunReasonerMojo extends AbstractMojo {
 	private static final Logger LOG = LoggerFactory.getLogger(RunReasonerMojo.class.getSimpleName());
 
+	@Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
+	File dataStore;
+
 	@Parameter(property = "reasonerType", defaultValue = "ElkOwlReasoner")
 	String reasonerType;
+
 	@Parameter(property = "reinferAllHierarchy", defaultValue = "false")
 	String reinferAllHierarchy;
+
 	@Override
 	public void execute() throws MojoExecutionException {
-
-		try (DatastoreProxy datastoreProxy = new DatastoreProxy()) {
-			datastoreProxy.start();
+		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			List<ReasonerService> rss = PluggableService.load(ReasonerService.class).stream().map(ServiceLoader.Provider::get).filter(reasoner -> reasoner.getName().contains(reasonerType))
 					.sorted(Comparator.comparing(ReasonerService::getName)).toList();
 			LOG.info("Number of reasoners " + rss.size());
@@ -71,6 +75,5 @@ public class RunReasonerMojo extends AbstractMojo {
 		} catch (Exception e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
-
 	}
 }

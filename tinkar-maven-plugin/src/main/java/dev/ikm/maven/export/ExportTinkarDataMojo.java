@@ -16,10 +16,6 @@
 package dev.ikm.maven.export;
 
 import dev.ikm.maven.DatastoreProxy;
-import dev.ikm.tinkar.common.service.CachingService;
-import dev.ikm.tinkar.common.service.PrimitiveData;
-import dev.ikm.tinkar.common.service.ServiceKeys;
-import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -28,30 +24,25 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 @Mojo(name = "export-tinkar-data", defaultPhase = LifecyclePhase.PACKAGE)
 public class ExportTinkarDataMojo extends AbstractMojo {
 
-    @Parameter(name = "exportDirectory", defaultValue = "${project.build.directory}", required = true)
+    @Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
+    File dataStore;
+
+    @Parameter(name = "exportDirectory", defaultValue = "${project.build.directory}")
     File exportDirectory;
 
     @Parameter(name = "fileName", defaultValue = "tinkar-export.zip", required = true)
-    String fileName;
+    File fileName;
 
     @Override
     public void execute() throws MojoExecutionException {
-        try (DatastoreProxy datastoreProxy = new DatastoreProxy()) {
-            datastoreProxy.start();
-
-            if (!exportDirectory.isDirectory()) {
-                Files.createDirectories(exportDirectory.toPath());
-            }
-
-            var exportTask = new ExportEntitiesToProtobufFile(exportDirectory.toPath().resolve(fileName).toFile());
+        try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
+            File exportFile = exportDirectory.toPath().resolve(fileName.toPath()).toFile();
+            var exportTask = new ExportEntitiesToProtobufFile(exportFile);
             exportTask.compute();
-
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
