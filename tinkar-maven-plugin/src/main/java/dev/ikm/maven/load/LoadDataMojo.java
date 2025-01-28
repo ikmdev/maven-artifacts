@@ -15,10 +15,8 @@
  */
 package dev.ikm.maven.load;
 
-import dev.ikm.maven.DatastoreProxy;
+import dev.ikm.maven.toolkit.SimpleTinkarMojo;
 import dev.ikm.tinkar.entity.load.LoadEntitiesFromProtobufFile;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -28,28 +26,19 @@ import java.io.File;
 import java.util.List;
 
 @Mojo(name = "load-data",requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class LoadDataMojo extends AbstractMojo {
-
-    @Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
-    File dataStore;
+public class LoadDataMojo extends SimpleTinkarMojo {
 
     @Parameter(name = "dataFiles", required = true)
     private List<File> dataFiles;
 
     @Override
-    public void execute() throws MojoExecutionException {
+    public void run() {
         if (dataFiles.isEmpty()) {
-            throw new MojoExecutionException("No starter data found");
+            throw new RuntimeException("No data found to load");
         }
-
-        try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
-            dataFiles.forEach(file -> {
-                var loadTask = new LoadEntitiesFromProtobufFile(file);
-                loadTask.compute();
-            });
-        } catch (Exception e) {
-            getLog().error(e);
-            throw new MojoExecutionException(e.getMessage(), e);
-        }
+        dataFiles.forEach(file -> {
+            var loadTask = new LoadEntitiesFromProtobufFile(file);
+            loadTask.compute();
+        });
     }
 }

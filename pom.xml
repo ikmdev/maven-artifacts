@@ -21,12 +21,7 @@
     <modules>
         <module>unzip-maven-plugin</module>
         <module>tinkar-maven-plugin</module>
-        <module>tinkar-origin-archetype</module>
-        <module>tinkar-transformation-archetype</module>
-        <module>starter-data-archetype</module>
-        <module>tinkar-change-set-archetype</module>
-        <module>tinkar-binding-archetype</module>
-        <module>tinkar-data-archetype</module>
+        <module>tinkar-maven-toolkit</module>
     </modules>
 
     <properties>
@@ -67,6 +62,11 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.ikm.maven</groupId>
+                <artifactId>tinkar-maven-toolkit</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${tinkar-core.group.id}</groupId>

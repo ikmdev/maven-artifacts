@@ -15,29 +15,16 @@
  */
 package dev.ikm.maven.test;
 
-import dev.ikm.maven.DatastoreProxy;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import dev.ikm.maven.toolkit.SimpleTinkarMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
 
 @Mojo(name = "test-data", defaultPhase = LifecyclePhase.TEST)
 
-public class TestDataMojo extends AbstractMojo {
-
-	@Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
-	File dataStore;
+public class TestDataMojo extends SimpleTinkarMojo {
 
 	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
+	public void run() {
 
-		} catch (Exception e) {
-			throw new MojoExecutionException("Error executing test", e);
-		}
 	}
 }

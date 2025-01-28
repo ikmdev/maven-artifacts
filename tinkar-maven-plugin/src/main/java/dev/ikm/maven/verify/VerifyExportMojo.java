@@ -15,27 +15,15 @@
  */
 package dev.ikm.maven.verify;
 
-import dev.ikm.maven.DatastoreProxy;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
+import dev.ikm.maven.toolkit.SimpleTinkarMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
 
 @Mojo(name = "verify-export", defaultPhase = LifecyclePhase.VERIFY)
-public class VerifyExportMojo extends AbstractMojo {
-
-	@Parameter(name = "dataStore", defaultValue = "${project.build.directory}/datastore")
-	File dataStore;
+public class VerifyExportMojo extends SimpleTinkarMojo {
 
 	@Override
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)){
-		} catch (Exception e) {
-			throw new MojoExecutionException("Error while executing verify export", e);
-		}
+	public void run() throws Exception {
+
 	}
 }
