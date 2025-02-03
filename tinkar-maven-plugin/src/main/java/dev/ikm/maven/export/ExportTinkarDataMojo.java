@@ -29,12 +29,12 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
     @Parameter(name = "exportDirectory", defaultValue = "${project.build.directory}")
     File exportDirectory;
 
-    @Parameter(name = "fileName", defaultValue = "tinkar-export.zip", required = true)
+    @Parameter(name = "fileName", defaultValue = "tinkar-export.zip")
     File fileName;
 
     @Override
     public void run() {
-        File exportFile = exportDirectory.toPath().resolve(fileName.toPath()).toFile();
+        File exportFile = exportDirectory.toPath().resolve(fileName.getName()).toFile();
         var exportTask = new ExportEntitiesToProtobufFile(exportFile);
         exportTask.compute();
     }
