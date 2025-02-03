@@ -19,7 +19,6 @@
     <name>Maven Artifacts</name>
 
     <modules>
-        <module>unzip-maven-plugin</module>
         <module>tinkar-maven-plugin</module>
         <module>tinkar-maven-toolkit</module>
     </modules>

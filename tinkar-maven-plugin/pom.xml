@@ -50,6 +50,11 @@
             <groupId>${tinkar-core.group.id}</groupId>
             <artifactId>reasoner-hybrid</artifactId>
         </dependency>
+        <!-- External -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>org.slf4j</groupId>

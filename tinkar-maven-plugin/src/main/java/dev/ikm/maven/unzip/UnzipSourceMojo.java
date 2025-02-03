@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package dev.ikm.tinkar.maven;
+package dev.ikm.maven.unzip;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.AbstractMojo;
@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -65,7 +64,6 @@ public class UnzipSourceMojo extends AbstractMojo {
              * created. isDirectory() checks for both if file exists and if File is directory type.
              * Using createDirectories helps if the parent directory supplied doesn't exist.
              */
-
             if (outputDirectory.isDirectory()) {
                 FileUtils.deleteDirectory(outputDirectory);
                 Files.createDirectory(outputDirectory.toPath());
@@ -73,34 +71,37 @@ public class UnzipSourceMojo extends AbstractMojo {
                 Files.createDirectories(outputDirectory.toPath());
             }
 
-            //Getting the next entry in the zip
+            //The below algorithm was ported over from: https://www.baeldung.com/java-compress-and-uncompress
+            byte[] buffer = new byte[1024];
             ZipEntry zipEntry = zipInputStream.getNextEntry();
             while (zipEntry != null) {
-                //Append the correct directory to the new entry
-                Path newEntry = outputDirectory.toPath().resolve(zipEntry.getName()).normalize();
-
-                //Check if the new entry is on the ignore list
-                if (checkIgnore(newEntry.toString())) {
-                    zipEntry = zipInputStream.getNextEntry();
+                if (checkIgnore(zipEntry.getName())) {
                     continue;
                 }
-
-                //Check if the new entry is a directory, then create, else write the file to disk
+                File newFile = newFile(outputDirectory, zipEntry);
                 if (zipEntry.isDirectory()) {
-                    Files.createDirectory(newEntry);
+                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
+                        throw new IOException("Failed to create directory " + newFile);
+                    }
                 } else {
-                    FileOutputStream fos = new FileOutputStream(newEntry.toFile());
+                    // fix for Windows-created archives
+                    File parent = newFile.getParentFile();
+                    if (!parent.isDirectory() && !parent.mkdirs()) {
+                        throw new IOException("Failed to create directory " + parent);
+                    }
+
+                    // write file content
+                    FileOutputStream fos = new FileOutputStream(newFile);
                     int len;
-                    byte[] buffer = new byte[1024];
                     while ((len = zipInputStream.read(buffer)) > 0) {
                         fos.write(buffer, 0, len);
                     }
                     fos.close();
                 }
-                zipInputStream.closeEntry();
                 zipEntry = zipInputStream.getNextEntry();
             }
-        }catch (IOException e){
+            zipInputStream.closeEntry();
+		}catch (IOException e){
             getLog().error(e.getMessage(), e);
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -118,5 +119,17 @@ public class UnzipSourceMojo extends AbstractMojo {
             }
         }
         return false;
+    }
+
+    public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+        return destFile;
     }
 }

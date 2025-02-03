@@ -1,5 +1,7 @@
 package dev.ikm.maven.toolkit;
 
+import dev.ikm.tinkar.common.service.PrimitiveData;
+
 public abstract class SimpleTinkarMojo extends TinkarMojo {
 
 	@Override
