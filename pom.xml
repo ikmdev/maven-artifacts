@@ -13,7 +13,7 @@
 
     <groupId>dev.ikm.maven</groupId>
     <artifactId>maven-artifacts</artifactId>
-    <version>1.12.0-SNAPSHOT</version>
+    <version>1.12.0-arch-move-unzip-plugin-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Maven Artifacts</name>
