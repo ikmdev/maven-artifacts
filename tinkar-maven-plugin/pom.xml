@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>dev.ikm.maven</groupId>
+        <groupId>dev.ikm.maven.tinkar</groupId>
         <artifactId>maven-artifacts</artifactId>
         <version>1.14.0-groupId-change-SNAPSHOT</version>
     </parent>
@@ -26,7 +26,7 @@
         </dependency>
         <!-- Tinkar Maven -->
         <dependency>
-            <groupId>dev.ikm.maven</groupId>
+            <groupId>dev.ikm.maven.tinkar</groupId>
             <artifactId>tinkar-maven-toolkit</artifactId>
         </dependency>
         <!-- Tinkar Core supporting services -->

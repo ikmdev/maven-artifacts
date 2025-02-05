@@ -11,7 +11,7 @@
         <relativePath />
     </parent>
 
-    <groupId>dev.ikm.maven</groupId>
+    <groupId>dev.ikm.maven.tinkar</groupId>
     <artifactId>maven-artifacts</artifactId>
     <version>1.14.0-groupId-change-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -63,7 +63,7 @@
                 <version>${commons-io.version}</version>
             </dependency>
             <dependency>
-                <groupId>dev.ikm.maven</groupId>
+                <groupId>dev.ikm.maven.tinkar</groupId>
                 <artifactId>tinkar-maven-toolkit</artifactId>
                 <version>${project.version}</version>
             </dependency>
