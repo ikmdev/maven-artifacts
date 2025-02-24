@@ -10,7 +10,7 @@ Architecture Team
 
 Required for running this:
 
-1. Download and install Open JDK Java 19
+1. Download and install Java 23 (Azul)
 
 ## Building and Running
 
