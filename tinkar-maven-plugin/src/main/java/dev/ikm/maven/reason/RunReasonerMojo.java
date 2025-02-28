@@ -32,7 +32,7 @@ import java.util.ServiceLoader;
 @Mojo(name = "run-full-reasoner", defaultPhase = LifecyclePhase.PROCESS_CLASSES)
 public class RunReasonerMojo extends SimpleTinkarMojo {
 
-	@Parameter(property = "reasonerType", defaultValue = "ElkOwlReasoner")
+	@Parameter(property = "reasonerType", defaultValue = "ElkSnomedReasoner")
 	String reasonerType;
 
 	@Override
