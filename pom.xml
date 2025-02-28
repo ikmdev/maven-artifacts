@@ -13,7 +13,7 @@
 
     <groupId>dev.ikm.maven.tinkar</groupId>
     <artifactId>maven-artifacts</artifactId>
-    <version>1.15.0-SNAPSHOT</version>
+    <version>1.15.0-tinkar-core-and-default-reasoner-updates-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Maven Artifacts</name>
