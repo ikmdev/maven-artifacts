@@ -11,6 +11,7 @@
   <description>An IT verifying Binding of tinkar data maven plugin</description>
 
   <properties>
+    <tinkar-example-data.version>1.1.0+1.1.1</tinkar-example-data.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -21,25 +22,27 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-test-data</id>
+            <id>copy</id>
             <phase>initialize</phase>
             <goals>
               <goal>copy</goal>
             </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>dev.ikm.tinkar.data</groupId>
-                  <artifactId>tinkar-starter-data-reasoned</artifactId>
-                  <version>@tinkar-starter-data.version@</version>
-                  <classifier>pb</classifier>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
-              <outputDirectory>${project.build.directory}/data</outputDirectory>
-            </configuration>
           </execution>
         </executions>
+        <configuration>
+          <artifactItems>
+            <artifactItem>
+              <groupId>dev.ikm.data.tinkar</groupId>
+              <artifactId>tinkar-example-data</artifactId>
+              <version>${tinkar-example-data.version}</version>
+              <classifier>reasoned-pb</classifier>
+              <type>zip</type>
+            </artifactItem>
+          </artifactItems>
+          <outputDirectory>${project.build.directory}/data</outputDirectory>
+          <overWriteReleases>false</overWriteReleases>
+          <overWriteSnapshots>true</overWriteSnapshots>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>@project.groupId@</groupId>
@@ -47,13 +50,13 @@
         <version>@project.version@</version>
         <executions>
           <execution>
-            <id>load-data</id>
+            <id>load-artifact-data</id>
             <goals>
-              <goal>load-data</goal>
+              <goal>load-artifact-data</goal>
             </goals>
             <configuration>
               <dataFiles>
-                <dataFile>${project.build.directory}/data/tinkar-starter-data-reasoned-@tinkar-starter-data.version@-pb.zip</dataFile>
+                <dataFile>${project.build.directory}/data/tinkar-example-data-${tinkar-example-data.version}-reasoned-pb.zip</dataFile>
               </dataFiles>
             </configuration>
           </execution>

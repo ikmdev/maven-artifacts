@@ -1,6 +1,6 @@
 package dev.ikm.maven.toolkit;
 
-import dev.ikm.tinkar.common.service.PrimitiveData;
+import dev.ikm.tinkar.entity.Entity;
 
 public abstract class SimpleTinkarMojo extends TinkarMojo {
 
@@ -8,7 +8,9 @@ public abstract class SimpleTinkarMojo extends TinkarMojo {
 	public void execute(){
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			if (datastoreProxy.running()) {
+				Entity.provider().beginLoadPhase();
 				run();
+				Entity.provider().endLoadPhase();
 			} else {
 				throw new RuntimeException("Datastore not running");
 			}
