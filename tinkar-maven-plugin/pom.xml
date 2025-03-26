@@ -7,7 +7,7 @@
     <parent>
         <groupId>dev.ikm.maven.tinkar</groupId>
         <artifactId>maven-artifacts</artifactId>
-        <version>1.18.0-starter-data-publishing-SNAPSHOT</version>
+        <version>1.18.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>tinkar-maven-plugin</artifactId>
