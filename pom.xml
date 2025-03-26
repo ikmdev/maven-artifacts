@@ -36,6 +36,7 @@
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
         <tinkar-core.version>1.90.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
+        <file-management.version>3.1.0</file-management.version>
     </properties>
 
     <licenses>
@@ -136,6 +137,11 @@
                 <groupId>${tinkar-core.group.id}</groupId>
                 <artifactId>reasoner-hybrid</artifactId>
                 <version>${tinkar-core.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.shared</groupId>
+                <artifactId>file-management</artifactId>
+                <version>${file-management.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

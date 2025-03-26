@@ -21,46 +21,39 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.shared.model.fileset.FileSet;
+import org.apache.maven.shared.model.fileset.util.FileSetManager;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Stream;
 
 @Mojo(name = "load-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class LoadArtifactDataMojo extends SimpleTinkarMojo {
+public class LoadDataMojo extends SimpleTinkarMojo {
 
-    @Parameter(name = "dataFiles")
-    private List<File> dataFiles;
+    private final FileSetManager fileSetManager = new FileSetManager();
 
-    @Parameter(name = "dataDirectory")
-    private File dataDirectory;
+    @Parameter(name= "filesets")
+    private FileSet[] filesets;
+
+    @Parameter(name = "fileset")
+    private FileSet fileset;
 
     @Override
     public void run() {
-        if (dataFiles != null) {
-            dataFiles.forEach(file -> {
-                if (!file.getName().endsWith("pb.zip")) {
-                    getLog().warn("Unsupported file type: " + file.getName());
-                }
-                loadEntities(file);
-            });
-        }
-        if (dataDirectory != null) {
-            try(Stream<Path> paths = Files.walk(dataDirectory.toPath())) {
-                paths.forEach(path -> {
-                    loadEntities(path.toFile());
-                });
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        if (filesets != null) {
+            for (FileSet fileSet : filesets) {
+               loadFileset(fileSet);
             }
+        }
+        if (fileset != null) {
+           loadFileset(fileset);
         }
     }
 
-    private void loadEntities(File file) {
-        var loadTask = new LoadEntitiesFromProtobufFile(file);
-        loadTask.compute();
+    private void loadFileset(FileSet fileset) {
+        for (String includeFile : fileSetManager.getIncludedFiles(fileset)) {
+            File pbZip = new File(fileset.getDirectory(), includeFile);
+            var loadTask = new LoadEntitiesFromProtobufFile(pbZip);
+            loadTask.compute();
+        }
     }
 }
