@@ -34,7 +34,7 @@
         <maven-archetype-packaging.version>3.1.1</maven-archetype-packaging.version>
         <commons-io.version>2.18.0</commons-io.version>
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
-        <tinkar-core.version>1.92.0</tinkar-core.version>
+        <tinkar-core.version>1.95.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
         <file-management.version>3.1.0</file-management.version>
     </properties>
