@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.load;
 
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.IsolatedTinkarMojo;
 import dev.ikm.tinkar.entity.load.LoadEntitiesFromProtobufFile;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -27,15 +27,20 @@ import org.apache.maven.shared.model.fileset.util.FileSetManager;
 import java.io.File;
 
 @Mojo(name = "load-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class LoadDataMojo extends SimpleTinkarMojo {
+public class LoadDataMojo extends IsolatedTinkarMojo {
 
-    private final FileSetManager fileSetManager = new FileSetManager();
+    private transient final FileSetManager fileSetManager = new FileSetManager();
 
     @Parameter(name= "filesets")
     private FileSet[] filesets;
 
     @Parameter(name = "fileset")
     private FileSet fileset;
+
+    @Override
+    public void initIsolatedFields() {
+
+    }
 
     @Override
     public void run() {
@@ -48,6 +53,8 @@ public class LoadDataMojo extends SimpleTinkarMojo {
            loadFileset(fileset);
         }
     }
+
+
 
     private void loadFileset(FileSet fileset) {
         for (String includeFile : fileSetManager.getIncludedFiles(fileset)) {

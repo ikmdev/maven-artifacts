@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.verify;
 
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
@@ -23,7 +23,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class VerifyExportMojo extends SimpleTinkarMojo {
 
 	@Override
-	public void run() throws Exception {
+	public void run() {
 
 	}
 }

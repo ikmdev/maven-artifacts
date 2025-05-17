@@ -1,11 +1,18 @@
-package dev.ikm.maven.toolkit;
+package dev.ikm.maven.toolkit.boundary;
 
+import dev.ikm.maven.toolkit.controller.DatastoreProxy;
+import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.Entity;
 
 public abstract class SimpleTinkarMojo extends TinkarMojo {
 
+	public static void main(String... args) {
+
+	}
+
 	@Override
 	public void execute(){
+		getLog().info("execute: " + ServiceProperties.jvmUuid());
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			if (datastoreProxy.running()) {
 				Entity.provider().beginLoadPhase();
@@ -19,10 +26,4 @@ public abstract class SimpleTinkarMojo extends TinkarMojo {
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
-
-	/**
-	 * Runs the plugin in code. This is a convenience method to handle logging and exception cases.
-	 * @throws Exception
-	 */
-	public abstract void run() throws Exception;
 }

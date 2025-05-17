@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.reason;
 
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.service.PluggableService;
 import dev.ikm.tinkar.coordinate.Calculators;
 import dev.ikm.tinkar.reasoner.service.ClassifierResults;
@@ -36,29 +36,33 @@ public class RunReasonerMojo extends SimpleTinkarMojo {
 	String reasonerType;
 
 	@Override
-	public void run() throws Exception {
+	public void run() {
 		List<ReasonerService> rss = PluggableService.load(ReasonerService.class).stream().map(ServiceLoader.Provider::get).filter(reasoner -> reasoner.getName().contains(reasonerType))
 				.sorted(Comparator.comparing(ReasonerService::getName)).toList();
 		getLog().info("Number of reasoners " + rss.size());
-		for (ReasonerService rs : rss) {
-			getLog().info("Reasoner service: " + rs);
-			rs.init(Calculators.View.Default(), TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN, TinkarTerm.EL_PLUS_PLUS_INFERRED_AXIOMS_PATTERN);
-			rs.setProgressUpdater(null);
-			// Extract
-			rs.extractData();
-			// Load
-			rs.loadData();
-			// Compute
-			rs.computeInferences();
-			// Build NNF
-			rs.buildNecessaryNormalForm();
-			// Write inferred results
-			ClassifierResults results = rs.writeInferredResults();
+		try {
+			for (ReasonerService rs : rss) {
+				getLog().info("Reasoner service: " + rs);
+				rs.init(Calculators.View.Default(), TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN, TinkarTerm.EL_PLUS_PLUS_INFERRED_AXIOMS_PATTERN);
+				rs.setProgressUpdater(null);
+				// Extract
+				rs.extractData();
+				// Load
+				rs.loadData();
+				// Compute
+				rs.computeInferences();
+				// Build NNF
+				rs.buildNecessaryNormalForm();
+				// Write inferred results
+				ClassifierResults results = rs.writeInferredResults();
 
-			getLog().info("After Size of ConceptSet: " + rs.getReasonerConceptSet().size());
-			getLog().info("ClassifierResults: inferred changes size " + results.getConceptsWithInferredChanges().size());
-			getLog().info("ClassifierResults: navigation changes size " + results.getConceptsWithNavigationChanges().size());
-			getLog().info("ClassifierResults: classificationconcept size " + results.getClassificationConceptSet().size());
+				getLog().info("After Size of ConceptSet: " + rs.getReasonerConceptSet().size());
+				getLog().info("ClassifierResults: inferred changes size " + results.getConceptsWithInferredChanges().size());
+				getLog().info("ClassifierResults: navigation changes size " + results.getConceptsWithNavigationChanges().size());
+				getLog().info("ClassifierResults: classificationconcept size " + results.getClassificationConceptSet().size());
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

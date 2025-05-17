@@ -18,7 +18,7 @@ package dev.ikm.maven.bind;
 import dev.ikm.maven.bind.config.CharacterReplacement;
 import dev.ikm.maven.bind.config.LanguageConfiguration;
 import dev.ikm.maven.bind.config.StampConfiguration;
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.coordinate.language.LanguageCoordinateRecord;
 import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculator;
@@ -67,7 +67,7 @@ public class GenerateJavaBindingMojo extends SimpleTinkarMojo {
 	private List<String> languageConfigurations;
 
 	@Override
-	public void run() throws Exception {
+	public void run() {
 		Stream.Builder<Entity<? extends EntityVersion>> conceptStreamBuilder = Stream.builder();
 		Stream.Builder<Entity<? extends EntityVersion>> patternStreamBuilder = Stream.builder();
 		PrimitiveData.get().forEachConceptNid(nid -> conceptStreamBuilder.add(EntityService.get().getEntityFast(nid)));
@@ -130,7 +130,13 @@ public class GenerateJavaBindingMojo extends SimpleTinkarMojo {
 					})
 			);
 
-			generateJavaBindingTask.call();
+			try {
+				generateJavaBindingTask.call();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

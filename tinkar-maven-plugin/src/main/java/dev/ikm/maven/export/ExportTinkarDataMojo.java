@@ -17,7 +17,7 @@ package dev.ikm.maven.export;
 
 import dev.ikm.maven.export.config.ComponentFilter;
 import dev.ikm.maven.export.config.PublicIdConfig;
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -44,19 +44,24 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
     List<ComponentFilter> filters;
 
     @Override
-    public void run() throws MojoExecutionException {
+    public void run() {
         try {
             Files.createDirectories(exportDirectory.toPath());
         } catch (IOException e) {
             getLog().debug(e);
-            throw new MojoExecutionException(e);
+            throw  new RuntimeException(e);
         }
         File exportFile = exportDirectory.toPath().resolve(fileName.getName()).toFile();
 
         ExportEntitiesToProtobufFile exportTask;
-        List<PublicId> membershipPublicIds = getMemberships();
+		List<PublicId> membershipPublicIds = null;
+		try {
+			membershipPublicIds = getMemberships(); //TODO-aks8m: refactor these
+		} catch (MojoExecutionException e) {
+			throw new RuntimeException(e);
+		}
 
-        if (!membershipPublicIds.isEmpty()) {
+		if (!membershipPublicIds.isEmpty()) {
             exportTask = new ExportEntitiesToProtobufFile(exportFile, membershipPublicIds);
         } else {
             exportTask = new ExportEntitiesToProtobufFile(exportFile);

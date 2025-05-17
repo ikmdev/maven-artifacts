@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.transform;
 
-import dev.ikm.maven.toolkit.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.entity.transaction.Transaction;
 import dev.ikm.tinkar.ext.lang.owl.Rf2OwlToLogicAxiomTransformer;
 import dev.ikm.tinkar.terms.TinkarTerm;
@@ -26,12 +26,16 @@ import org.apache.maven.plugins.annotations.Mojo;
 public class RunOWLTransformerMojo extends SimpleTinkarMojo {
 
 	@Override
-	public void run() throws Exception {
+	public void run() {
 		Transaction owlTransformTransaction = new Transaction();
 		Rf2OwlToLogicAxiomTransformer rf2OwlToLogicAxiomTransformer = new Rf2OwlToLogicAxiomTransformer(
 				owlTransformTransaction,
 				TinkarTerm.OWL_AXIOM_SYNTAX_PATTERN,
 				TinkarTerm.EL_PLUS_PLUS_STATED_AXIOMS_PATTERN);
-		rf2OwlToLogicAxiomTransformer.call();
+		try {
+			rf2OwlToLogicAxiomTransformer.call();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
