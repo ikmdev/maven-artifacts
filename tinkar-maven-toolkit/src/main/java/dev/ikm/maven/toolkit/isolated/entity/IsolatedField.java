@@ -1,4 +1,4 @@
-package dev.ikm.maven.toolkit.entity;
+package dev.ikm.maven.toolkit.isolated.entity;
 
 import java.io.Serializable;
 

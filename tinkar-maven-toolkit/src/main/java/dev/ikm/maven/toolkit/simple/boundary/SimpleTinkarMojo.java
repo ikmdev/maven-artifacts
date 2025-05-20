@@ -1,18 +1,15 @@
-package dev.ikm.maven.toolkit.boundary;
+package dev.ikm.maven.toolkit.simple.boundary;
 
-import dev.ikm.maven.toolkit.controller.DatastoreProxy;
+import dev.ikm.maven.toolkit.TinkarMojo;
+import dev.ikm.maven.toolkit.DatastoreProxy;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.Entity;
 
 public abstract class SimpleTinkarMojo extends TinkarMojo {
 
-	public static void main(String... args) {
-
-	}
-
 	@Override
 	public void execute(){
-		getLog().info("execute: " + ServiceProperties.jvmUuid());
+		getLog().info("SimpleTinkarMojo: " + ServiceProperties.jvmUuid());
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			if (datastoreProxy.running()) {
 				Entity.provider().beginLoadPhase();

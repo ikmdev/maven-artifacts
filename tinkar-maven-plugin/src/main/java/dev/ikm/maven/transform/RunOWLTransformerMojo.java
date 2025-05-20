@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.transform;
 
-import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.entity.transaction.Transaction;
 import dev.ikm.tinkar.ext.lang.owl.Rf2OwlToLogicAxiomTransformer;
 import dev.ikm.tinkar.terms.TinkarTerm;

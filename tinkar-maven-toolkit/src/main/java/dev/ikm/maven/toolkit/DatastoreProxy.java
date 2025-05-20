@@ -1,4 +1,4 @@
-package dev.ikm.maven.toolkit.controller;
+package dev.ikm.maven.toolkit;
 
 import dev.ikm.tinkar.common.service.CachingService;
 import dev.ikm.tinkar.common.service.PrimitiveData;

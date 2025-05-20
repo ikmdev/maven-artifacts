@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.reason;
 
-import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.service.PluggableService;
 import dev.ikm.tinkar.coordinate.Calculators;
 import dev.ikm.tinkar.reasoner.service.ClassifierResults;

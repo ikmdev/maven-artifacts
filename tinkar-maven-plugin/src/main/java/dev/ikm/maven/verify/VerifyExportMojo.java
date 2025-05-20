@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.verify;
 
-import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 

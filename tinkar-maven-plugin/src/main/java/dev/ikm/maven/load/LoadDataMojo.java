@@ -15,7 +15,7 @@
  */
 package dev.ikm.maven.load;
 
-import dev.ikm.maven.toolkit.boundary.IsolatedTinkarMojo;
+import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.tinkar.entity.load.LoadEntitiesFromProtobufFile;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -38,7 +38,7 @@ public class LoadDataMojo extends IsolatedTinkarMojo {
     private FileSet fileset;
 
     @Override
-    public void initIsolatedFields() {
+    public void handleIsolatedFields() {
 
     }
 

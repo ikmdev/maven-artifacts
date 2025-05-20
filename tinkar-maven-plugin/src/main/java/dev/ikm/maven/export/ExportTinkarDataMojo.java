@@ -17,7 +17,7 @@ package dev.ikm.maven.export;
 
 import dev.ikm.maven.export.config.ComponentFilter;
 import dev.ikm.maven.export.config.PublicIdConfig;
-import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
 import org.apache.maven.plugin.MojoExecutionException;

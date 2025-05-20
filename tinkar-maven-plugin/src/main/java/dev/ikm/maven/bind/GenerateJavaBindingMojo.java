@@ -18,7 +18,7 @@ package dev.ikm.maven.bind;
 import dev.ikm.maven.bind.config.CharacterReplacement;
 import dev.ikm.maven.bind.config.LanguageConfiguration;
 import dev.ikm.maven.bind.config.StampConfiguration;
-import dev.ikm.maven.toolkit.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.coordinate.language.LanguageCoordinateRecord;
 import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculator;

@@ -1,7 +1,7 @@
 package dev.ikm.maven.fork;
 
-import dev.ikm.maven.toolkit.boundary.Isolate;
-import dev.ikm.maven.toolkit.boundary.IsolatedTinkarMojo;
+import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
+import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -40,14 +40,12 @@ public class ExecFork extends IsolatedTinkarMojo {
 	private Set<File> filesFromFileSet = new HashSet<>();
 
 	@Override
-	public void initIsolatedFields() {
+	public void handleIsolatedFields() {
 		FileSetManager fileSetManager = new FileSetManager();
 		for (String filePath : fileSetManager.getIncludedFiles(fileset)) {
 			filesFromFileSet.add(new File(filePath));
 		}
 	}
-
-
 
 	@Override
 	public void run() {

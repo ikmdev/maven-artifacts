@@ -1,4 +1,4 @@
-package dev.ikm.maven.toolkit.boundary;
+package dev.ikm.maven.toolkit.isolated.boundary;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
