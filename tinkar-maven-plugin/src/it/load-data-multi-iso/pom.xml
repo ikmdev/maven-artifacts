@@ -4,14 +4,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dev.ikm.maven.it</groupId>
-  <artifactId>fork-it</artifactId>
+  <artifactId>load-data-multi-isolated-it</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>An IT verifying Forking of Tinkar Data maven plugin</description>
+  <description>An IT verifying Load multiple artifacts (declared) of Tinkar Data maven plugin</description>
 
   <properties>
     <tinkar-starter-data.version>1.1.0</tinkar-starter-data.version>
+    <tinkar-example-data.version>1.1.0+1.1.1</tinkar-example-data.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -42,6 +43,27 @@
               <overWriteSnapshots>true</overWriteSnapshots>
             </configuration>
           </execution>
+          <execution>
+            <id>download-tinkar-example-data</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>dev.ikm.data.tinkar</groupId>
+                  <artifactId>tinkar-example-data</artifactId>
+                  <version>${tinkar-example-data.version}</version>
+                  <classifier>reasoned-pb</classifier>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${project.build.directory}/data</outputDirectory>
+              <overWriteReleases>false</overWriteReleases>
+              <overWriteSnapshots>true</overWriteSnapshots>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -50,18 +72,25 @@
         <version>@project.version@</version>
         <executions>
           <execution>
-            <id>fork-test</id>
+            <id>load-data-isolated</id>
             <goals>
-              <goal>execFork</goal>
+              <goal>load-data-isolated</goal>
             </goals>
             <configuration>
-              <debug>true</debug>
-              <fileset>
-                <directory>${project.build.directory}/data</directory>
-                <includes>
-                  <include>tinkar-starter-data-${tinkar-starter-data.version}-reasoned-pb.zip</include>
-                </includes>
-              </fileset>
+              <filesets>
+                <fileset>
+                  <directory>${project.build.directory}/data</directory>
+                  <includes>
+                    <include>tinkar-example-data-${tinkar-example-data.version}-reasoned-pb.zip</include>
+                  </includes>
+                </fileset>
+                <fileset>
+                  <directory>${project.build.directory}/data</directory>
+                  <includes>
+                    <include>tinkar-starter-data-${tinkar-starter-data.version}-reasoned-pb.zip</include>
+                  </includes>
+                </fileset>
+              </filesets>
             </configuration>
           </execution>
         </executions>

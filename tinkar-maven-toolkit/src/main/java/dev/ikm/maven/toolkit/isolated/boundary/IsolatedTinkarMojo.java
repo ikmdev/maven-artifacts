@@ -9,11 +9,15 @@ import dev.ikm.tinkar.entity.Entity;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.List;
 
 public abstract class IsolatedTinkarMojo extends TinkarMojo {
+
+	private final static Logger LOG = LoggerFactory.getLogger(IsolatedTinkarMojo.class.getSimpleName());
 
 	@Parameter(defaultValue = "${project}", readonly = true, required = true)
 	private MavenProject project;
@@ -42,9 +46,11 @@ public abstract class IsolatedTinkarMojo extends TinkarMojo {
 	public abstract void handleIsolatedFields();
 
 	public static void main(String... args) throws Exception {
-		System.out.println("fork: " + ServiceProperties.jvmUuid());
+		LOG.info("fork: " + ServiceProperties.jvmUuid());
 		IsolationReceiver isolationReceiver = new IsolationReceiver(args[0], args[1]);
 		IsolatedTinkarMojo isolatedTinkarMojo = isolationReceiver.runnableInstance();
+		LOG.info("isolated directory: " + args[0]);
+		LOG.info("class path: " + args[1]);
 
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(isolatedTinkarMojo.dataStore)) {
 			if (datastoreProxy.running()) {
@@ -58,5 +64,7 @@ public abstract class IsolatedTinkarMojo extends TinkarMojo {
 			System.err.println(e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
+
+		Thread.sleep(3000); //FIXME-aks8m: This is to allow time for Lucene to release file lock
 	}
 }
