@@ -40,12 +40,9 @@
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
         <tinkar-core.version>1.103.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
-<<<<<<< HEAD
         <file-management.version>3.1.0</file-management.version>
         <maven-project.version>2.2.1</maven-project.version>
-=======
         <file-management.version>3.2.0</file-management.version>
->>>>>>> 79a86ac1a8d7ca7698b063f34a469b0077834971
     </properties>
 
     <licenses>
