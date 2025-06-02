@@ -50,6 +50,8 @@
         <file-management.version>3.1.0</file-management.version>
         <maven-project.version>2.2.1</maven-project.version>
         <file-management.version>3.2.0</file-management.version>
+        <plexus-container-defualt.version>2.1.0</plexus-container-defualt.version>
+        <maven-core.version>3.9.6</maven-core.version>
     </properties>
 
     <licenses>
@@ -160,6 +162,17 @@
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-project</artifactId>
                 <version>${maven-project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-container-default</artifactId>
+                <version>${plexus-container-defualt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${maven-core.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
