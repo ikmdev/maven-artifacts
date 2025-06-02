@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.ikm.maven.it</groupId>
+    <artifactId>reasoner-isolated</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <description>An IT verifying Reasoner tinkar data maven plugin</description>
+
+    <properties>
+        <tinkar-starter-data.version>1.1.0</tinkar-starter-data.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>download-tinkar-starter-data</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>dev.ikm.data.tinkar</groupId>
+                                    <artifactId>tinkar-starter-data</artifactId>
+                                    <version>${tinkar-starter-data.version}</version>
+                                    <classifier>unreasoned-pb</classifier>
+                                    <type>zip</type>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/data</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>@project.groupId@</groupId>
+                <artifactId>@project.artifactId@</artifactId>
+                <version>@project.version@</version>
+                <executions>
+                    <execution>
+                        <id>load-data-isolated</id>
+                        <goals>
+                            <goal>load-data-isolated</goal>
+                        </goals>
+                        <configuration>
+                            <fileset>
+                                <directory>${project.build.directory}/data</directory>
+                                <includes>
+                                    <include>tinkar-starter-data-${tinkar-starter-data.version}-unreasoned-pb.zip
+                                    </include>
+                                </includes>
+                            </fileset>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>full-reasoner-isolated</id>
+                        <goals>
+                            <goal>run-full-reasoner-isolated</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>export-data-isolated</id>
+                        <goals>
+                            <goal>export-tinkar-data-isolated</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -5,12 +5,16 @@ import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.common.service.ServiceKeys;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.common.util.io.FileUtil;
+import dev.ikm.tinkar.entity.EntityService;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * A proxy that centralizes and provides a simplified (closeable) entry to the Tinkar-Core Entity Provider
+ */
 public class DatastoreProxy implements Closeable {
 
     private static final String EPHEMERAL_DATASTORE_NAME = "Load Ephemeral Store";
@@ -42,6 +46,7 @@ public class DatastoreProxy implements Closeable {
         ServiceProperties.set(ServiceKeys.DATA_STORE_ROOT, datastoreDirectory);
         PrimitiveData.selectControllerByName(SPINED_ARRAY_DATASTORE_NAME);
         PrimitiveData.start();
+        EntityService.get().beginLoadPhase();
     }
 
     public void reload() {
@@ -58,6 +63,7 @@ public class DatastoreProxy implements Closeable {
 
     @Override
     public void close() {
+        EntityService.get().endLoadPhase();
         PrimitiveData.stop();
     }
 }

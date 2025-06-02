@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dev.ikm.maven.it</groupId>
-  <artifactId>manifest-it</artifactId>
+  <artifactId>manifest</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 

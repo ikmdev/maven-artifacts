@@ -8,6 +8,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.List;
 
+/**
+ * Receive the isolated mojo that is to be run in a separate JVM
+ */
 public class IsolationReceiver {
 
 	private final IsolationFieldSerializer isolationFieldSerializer;
@@ -18,6 +21,10 @@ public class IsolationReceiver {
 		this.canonicalName = canonicalName;
 	}
 
+	/**
+	 * Create a new instance of the Mojo based on it's canonical name that was passed in from the JVM process
+	 * @return
+	 */
 	public IsolatedTinkarMojo runnableInstance() {
 		IsolatedTinkarMojo isolatedTinkarMojo = null;
 		try {
@@ -32,6 +39,11 @@ public class IsolationReceiver {
 		return isolatedTinkarMojo;
 	}
 
+	/**
+	 * Inject de-serialized fields into the new instance of the IsolatedMojo
+	 * @param isolatedTinkarMojo
+	 * @param isolatedFields
+	 */
 	private static void injectIsolatedFields(IsolatedTinkarMojo isolatedTinkarMojo, List<IsolatedField> isolatedFields) {
 		//Inject Isolated Fields into class fields (super)
 		Class<?> clazz =  isolatedTinkarMojo.getClass();

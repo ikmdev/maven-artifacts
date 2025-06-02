@@ -5,6 +5,9 @@ import dev.ikm.maven.toolkit.DatastoreProxy;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.entity.Entity;
 
+/**
+ * Abstract class that runs non-isolated tinkar mojos
+ */
 public abstract class SimpleTinkarMojo extends TinkarMojo {
 
 	@Override
@@ -12,9 +15,7 @@ public abstract class SimpleTinkarMojo extends TinkarMojo {
 		getLog().info("SimpleTinkarMojo: " + ServiceProperties.jvmUuid());
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(dataStore)) {
 			if (datastoreProxy.running()) {
-				Entity.provider().beginLoadPhase();
 				run();
-				Entity.provider().endLoadPhase();
 			} else {
 				throw new RuntimeException("Datastore not running");
 			}

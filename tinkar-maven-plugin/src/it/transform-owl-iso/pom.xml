@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>dev.ikm.maven.it</groupId>
-    <artifactId>reasoner-it</artifactId>
+    <artifactId>transform-owl-isolated</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <description>An IT verifying Reasoner tinkar data maven plugin</description>
+    <description>An IT verifying Owl Transform of tinkar data maven plugin</description>
 
     <properties>
-        <tinkar-starter-data.version>1.1.0</tinkar-starter-data.version>
+        <tinkar-example-data.version>1.1.0+1.1.1</tinkar-example-data.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -22,7 +22,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>download-tinkar-starter-data</id>
+                        <id>download-tinkar-example-data</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>copy</goal>
@@ -31,8 +31,8 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>dev.ikm.data.tinkar</groupId>
-                                    <artifactId>tinkar-starter-data</artifactId>
-                                    <version>${tinkar-starter-data.version}</version>
+                                    <artifactId>tinkar-example-data</artifactId>
+                                    <version>${tinkar-example-data.version}</version>
                                     <classifier>unreasoned-pb</classifier>
                                     <type>zip</type>
                                 </artifactItem>
@@ -50,30 +50,24 @@
                 <version>@project.version@</version>
                 <executions>
                     <execution>
-                        <id>load-data</id>
+                        <id>load-data-isolated</id>
                         <goals>
-                            <goal>load-data</goal>
+                            <goal>load-data-isolated</goal>
                         </goals>
                         <configuration>
                             <fileset>
                                 <directory>${project.build.directory}/data</directory>
                                 <includes>
-                                    <include>tinkar-starter-data-${tinkar-starter-data.version}-unreasoned-pb.zip
+                                    <include>tinkar-example-data-${tinkar-example-data.version}-unreasoned-pb.zip
                                     </include>
                                 </includes>
                             </fileset>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>full-reasoner</id>
+                        <id>owl-transform-isolated</id>
                         <goals>
-                            <goal>run-full-reasoner</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>export-data</id>
-                        <goals>
-                            <goal>export-tinkar-data</goal>
+                            <goal>run-owl-transformer-isolated</goal>
                         </goals>
                     </execution>
                 </executions>

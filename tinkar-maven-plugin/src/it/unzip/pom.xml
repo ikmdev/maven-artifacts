@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>dev.ikm.maven.it</groupId>
-  <artifactId>unzip-it</artifactId>
+  <artifactId>unzip</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 

@@ -21,7 +21,9 @@ import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.terms.EntityProxy;
 import org.apache.maven.plugin.MojoExecutionException;
 
-public class PublicIdConfig {
+import java.io.Serializable;
+
+public class PublicIdConfig implements Serializable {
 
     private String[] uuids;
 

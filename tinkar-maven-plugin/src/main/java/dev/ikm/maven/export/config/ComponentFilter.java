@@ -15,9 +15,10 @@
  */
 package dev.ikm.maven.export.config;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class ComponentFilter {
+public class ComponentFilter implements Serializable {
 	private List<PublicIdConfig> allowedMemberships;
 
 	public List<PublicIdConfig> allowedMemberships() {

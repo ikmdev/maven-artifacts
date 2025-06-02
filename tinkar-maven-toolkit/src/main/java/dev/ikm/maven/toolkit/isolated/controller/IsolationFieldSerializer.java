@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Class focused on providing serialization and deserialization of discoverable fields
+ */
 public class IsolationFieldSerializer {
 
 	private final Path isolatedFieldsDirectory;
@@ -28,6 +31,10 @@ public class IsolationFieldSerializer {
 		this.isolatedFields = new ArrayList<>();
 	}
 
+	/**
+	 * Discover all fields that are annotated with @Isolate from concrete and parent classes
+	 * @param isolatedTinkarMojo
+	 */
 	public void discoverIsolatedFields(IsolatedTinkarMojo isolatedTinkarMojo) {
 		//Gather all fields from instance and parent classes
 		ArrayList<Field> fields = new ArrayList<>();
@@ -51,6 +58,9 @@ public class IsolationFieldSerializer {
 				.toList());
 	}
 
+	/**
+	 * Write out discovered fields
+	 */
 	public void serializeFields() {
 		for (IsolatedField isolatedField : isolatedFields) {
 			try (FileOutputStream fos = new FileOutputStream(this.isolatedFieldsDirectory.resolve(isolatedField.name()).toFile() + suffix);
@@ -62,7 +72,10 @@ public class IsolationFieldSerializer {
 		}
 	}
 
-
+	/**
+	 * Read in fields that were serialized
+	 * @return
+	 */
 	public List<IsolatedField> deserializeIsolatedFields() {
 		ArrayList<IsolatedField> isolatedFields = new ArrayList<>();
 

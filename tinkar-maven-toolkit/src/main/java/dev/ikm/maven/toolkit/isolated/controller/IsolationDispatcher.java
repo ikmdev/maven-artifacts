@@ -1,6 +1,7 @@
 package dev.ikm.maven.toolkit.isolated.controller;
 
 import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
+import dev.ikm.maven.toolkit.isolated.entity.LogInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
+/**
+ * Isolation Dispatcher starts a new JVM and serializes fields necessary to be run in new JVM instance
+ */
 public class IsolationDispatcher {
 
 	Logger LOG = LoggerFactory.getLogger(IsolationDispatcher.class.getSimpleName());
@@ -32,9 +36,6 @@ public class IsolationDispatcher {
 	private Path isolatedDirectory;
 	private final Semaphore semaphore = new Semaphore(2);
 
-	private record LogInstant(String message, Instant instant) {
-	}
-
 	private IsolationDispatcher(Builder builder) {
 		this.isolatedTinkarMojo = builder.isolatedTinkarMojo;
 		this.classPath = builder.classPath;
@@ -43,6 +44,9 @@ public class IsolationDispatcher {
 		this.isolationFieldSerializer = new IsolationFieldSerializer(isolatedDirectory);
 	}
 
+	/**
+	 * Dispatch new instance of JVM and run Mojo
+	 */
 	public void dispatch() {
 		isolationFieldSerializer.discoverIsolatedFields(isolatedTinkarMojo);
 		isolationFieldSerializer.serializeFields();
@@ -77,6 +81,12 @@ public class IsolationDispatcher {
 
 	}
 
+	/**
+	 * Async capture output streams from dispatched JVM process
+	 * @param process - JVM process
+	 * @return
+	 * @throws IOException
+	 */
 	private List<LogInstant> logProcess(Process process) throws IOException {
 		List<LogInstant> list = new ArrayList<>();
 		final List<LogInstant> logInstants = Collections.synchronizedList(list);
@@ -147,6 +157,10 @@ public class IsolationDispatcher {
 			return this;
 		}
 
+		/**
+		 * Builder for creating an Isolation Dispatcher
+		 * @return
+		 */
 		public IsolationDispatcher build() {
 			Objects.requireNonNull(isolatedTinkarMojo);
 			Objects.requireNonNull(buildDirectory);

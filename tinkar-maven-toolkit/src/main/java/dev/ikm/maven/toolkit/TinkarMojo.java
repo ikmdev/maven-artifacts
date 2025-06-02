@@ -6,6 +6,9 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 
+/**
+ * Abstract Mojo that tries to standardize via inheritance where a Tinkar Mojo stores it's data (aka datastore)
+ */
 public abstract class TinkarMojo extends AbstractMojo implements Runnable {
 
 	@Isolate

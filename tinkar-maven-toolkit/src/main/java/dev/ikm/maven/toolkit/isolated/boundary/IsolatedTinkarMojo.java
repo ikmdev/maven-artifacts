@@ -5,7 +5,6 @@ import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.controller.IsolationDispatcher;
 import dev.ikm.maven.toolkit.isolated.controller.IsolationReceiver;
 import dev.ikm.tinkar.common.service.ServiceProperties;
-import dev.ikm.tinkar.entity.Entity;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -15,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.util.List;
 
+/**
+ * This class enables a mojo to be dynamically inject via Maven Parameters and then ran on a seperate JVM instance
+ */
 public abstract class IsolatedTinkarMojo extends TinkarMojo {
 
 	private final static Logger LOG = LoggerFactory.getLogger(IsolatedTinkarMojo.class.getSimpleName());
@@ -43,8 +45,16 @@ public abstract class IsolatedTinkarMojo extends TinkarMojo {
 		isolationDispatcher.dispatch();
 	}
 
+	/**
+	 * Handle any Maven injected Parameters that aren't serializable
+	 */
 	public abstract void handleIsolatedFields();
 
+	/**
+	 * Main method used to re-run a new instance of an isolated mojo in a separate JVM
+	 * @param args - Isolated Fields Directory and Canonical Class Name
+	 * @throws Exception
+	 */
 	public static void main(String... args) throws Exception {
 		LOG.info("fork: " + ServiceProperties.jvmUuid());
 		IsolationReceiver isolationReceiver = new IsolationReceiver(args[0], args[1]);
@@ -54,9 +64,7 @@ public abstract class IsolatedTinkarMojo extends TinkarMojo {
 
 		try (DatastoreProxy datastoreProxy = new DatastoreProxy(isolatedTinkarMojo.dataStore)) {
 			if (datastoreProxy.running()) {
-				Entity.provider().beginLoadPhase();
 				isolatedTinkarMojo.run();
-				Entity.provider().endLoadPhase();
 			} else {
 				throw new RuntimeException("Datastore not running");
 			}
