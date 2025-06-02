@@ -7,16 +7,20 @@
     <parent>
         <groupId>dev.ikm.build</groupId>
         <artifactId>java-parent</artifactId>
-        <version>1.58.0</version>
+        <version>1.59.0</version>
         <relativePath />
     </parent>
 
     <groupId>dev.ikm.maven.tinkar</groupId>
     <artifactId>maven-artifacts</artifactId>
-    <version>1.21.0-SNAPSHOT</version>
+    <version>1.22.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Maven Artifacts</name>
+
+    <prerequisites>
+        <maven>3.9.9</maven>
+    </prerequisites>
 
     <modules>
         <module>tinkar-maven-plugin</module>
@@ -30,14 +34,18 @@
         <maven-plugin-api.version>3.9.9</maven-plugin-api.version>
         <maven-invoker-plugin.version>3.9.0</maven-invoker-plugin.version>
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
-        <maven-archetype-plugin.version>3.3.1</maven-archetype-plugin.version>
+        <maven-archetype-plugin.version>3.4.0</maven-archetype-plugin.version>
         <maven-archetype-packaging.version>3.1.1</maven-archetype-packaging.version>
-        <commons-io.version>2.18.0</commons-io.version>
+        <commons-io.version>2.19.0</commons-io.version>
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
-        <tinkar-core.version>1.95.0</tinkar-core.version>
+        <tinkar-core.version>1.103.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
+<<<<<<< HEAD
         <file-management.version>3.1.0</file-management.version>
         <maven-project.version>2.2.1</maven-project.version>
+=======
+        <file-management.version>3.2.0</file-management.version>
+>>>>>>> 79a86ac1a8d7ca7698b063f34a469b0077834971
     </properties>
 
     <licenses>

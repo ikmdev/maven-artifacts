@@ -6,12 +6,16 @@
 	<parent>
 		<groupId>dev.ikm.maven.tinkar</groupId>
 		<artifactId>maven-artifacts</artifactId>
-		<version>1.21.0-SNAPSHOT</version>
+		<version>1.22.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tinkar-maven-toolkit</artifactId>
 
 	<name>Tinkar Maven Toolkit</name>
+
+	<prerequisites>
+        <maven>3.9.9</maven>
+    </prerequisites>
 
 	<dependencies>
 		<dependency>
