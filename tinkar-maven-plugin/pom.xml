@@ -55,6 +55,10 @@
             <groupId>${tinkar-core.group.id}</groupId>
             <artifactId>reasoner-hybrid</artifactId>
         </dependency>
+        <dependency>
+            <groupId>dev.ikm.tinkar</groupId>
+            <artifactId>forge</artifactId>
+        </dependency>
         <!-- External -->
         <dependency>
             <groupId>commons-io</groupId>

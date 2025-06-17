@@ -40,8 +40,8 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
     @Parameter(name = "fileName", defaultValue = "tinkar-export.zip")
     File fileName;
 
-    @Parameter(name = "filters", defaultValue = "${new ArrayList<ComponentFilter>()}")
-    List<ComponentFilter> filters;
+    @Parameter(name = "filter", defaultValue = "${new ArrayList<ComponentFilter>()}")
+    ComponentFilter filter;
 
     @Override
     public void run() {
@@ -55,11 +55,7 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
 
         ExportEntitiesToProtobufFile exportTask;
 		List<PublicId> membershipPublicIds = null;
-		try {
-			membershipPublicIds = getMemberships(); //TODO-aks8m: refactor these
-		} catch (MojoExecutionException e) {
-			throw new RuntimeException(e);
-		}
+		membershipPublicIds = filter.allowedMembershipsIds();
 
 		if (!membershipPublicIds.isEmpty()) {
             exportTask = new ExportEntitiesToProtobufFile(exportFile, membershipPublicIds);
@@ -67,15 +63,5 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
             exportTask = new ExportEntitiesToProtobufFile(exportFile);
         }
         exportTask.compute();
-    }
-
-    private List<PublicId> getMemberships() throws MojoExecutionException {
-        List<PublicId> memberships = new ArrayList<>();
-        for (ComponentFilter filter : filters) {
-            for (PublicIdConfig membership : filter.allowedMemberships()) {
-                memberships.add(membership.getPublicId());
-            }
-        }
-        return memberships;
     }
 }

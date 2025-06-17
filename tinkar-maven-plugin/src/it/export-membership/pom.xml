@@ -72,11 +72,11 @@
                         <configuration>
                             <filters>
                                 <filter>
-                                    <allowedMemberships>
+                                    <memberships>
                                         <publicId>
                                             <bindingName>TINKAR_BASE_MODEL_COMPONENT_PATTERN</bindingName>
                                         </publicId>
-                                    </allowedMemberships>
+                                    </memberships>
                                 </filter>
                             </filters>
                         </configuration>

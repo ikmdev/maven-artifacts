@@ -19,7 +19,6 @@ import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.common.id.PublicIds;
 import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.terms.EntityProxy;
-import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.Serializable;
 
@@ -30,7 +29,7 @@ public class PublicIdConfig implements Serializable {
     private String bindingName;
     private String bindingClassName = "dev.ikm.tinkar.terms.TinkarTerm";
 
-    public PublicId getPublicId() throws MojoExecutionException {
+    public PublicId getPublicId() {
         validate();
         if (!emptyUuids()) {
             return PublicIds.of(uuids);
@@ -38,7 +37,7 @@ public class PublicIdConfig implements Serializable {
         return getProxy().publicId();
     }
 
-    public <T extends EntityProxy> T getProxy() throws MojoExecutionException {
+    public <T extends EntityProxy> T getProxy() {
         validate();
         if (!emptyUuids()) {
             return EntityService.get().getEntityFast(getPublicId().asUuidArray()).toProxy();
@@ -47,13 +46,13 @@ public class PublicIdConfig implements Serializable {
             Class bindingClass = Class.forName(bindingClassName);
             return (T) bindingClass.getField(bindingName).get(bindingClass);
         } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException | ClassCastException e) {
-            throw new MojoExecutionException(e);
+            throw new RuntimeException(e);
         }
     }
 
-    private void validate() throws MojoExecutionException {
+    private void validate() {
         if (!emptyUuids() && !emptyBindingName()) {
-            throw new MojoExecutionException(PublicIdConfig.class.getSimpleName() + " cannot be instantiated with both uuids and bindings.");
+            throw new RuntimeException(PublicIdConfig.class.getSimpleName() + " cannot be instantiated with both uuids and bindings.");
         }
     }
 
