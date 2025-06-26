@@ -19,6 +19,10 @@ import dev.ikm.maven.export.config.ComponentFilter;
 import dev.ikm.maven.export.config.PublicIdConfig;
 import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.id.PublicId;
+import dev.ikm.tinkar.entity.aggregator.DefaultEntityAggregator;
+import dev.ikm.tinkar.entity.aggregator.EntityAggregator;
+import dev.ikm.tinkar.entity.aggregator.InferredEntityAggregatorFilter;
+import dev.ikm.tinkar.entity.aggregator.MembershipEntityAggregator;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -39,6 +43,9 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
 
     @Parameter(name = "fileName", defaultValue = "tinkar-export.zip")
     File fileName;
+
+    @Parameter(name = "unreasoned", defaultValue = "false")
+    boolean unreasoned;
 
     @Parameter(name = "filters", defaultValue = "${new ArrayList<ComponentFilter>()}")
     List<ComponentFilter> filters;
@@ -61,11 +68,14 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
 			throw new RuntimeException(e);
 		}
 
-		if (!membershipPublicIds.isEmpty()) {
-            exportTask = new ExportEntitiesToProtobufFile(exportFile, membershipPublicIds);
-        } else {
-            exportTask = new ExportEntitiesToProtobufFile(exportFile);
+        EntityAggregator entityAggregator = new DefaultEntityAggregator();
+        if (!membershipPublicIds.isEmpty()) {
+            entityAggregator = new MembershipEntityAggregator(membershipPublicIds);
         }
+        if (unreasoned) {
+            entityAggregator = new InferredEntityAggregatorFilter(entityAggregator);
+        }
+        exportTask = new ExportEntitiesToProtobufFile(exportFile, entityAggregator);
         exportTask.compute();
     }
 
