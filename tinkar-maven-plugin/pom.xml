@@ -7,7 +7,7 @@
     <parent>
         <groupId>dev.ikm.maven.tinkar</groupId>
         <artifactId>maven-artifacts</artifactId>
-        <version>1.28.0-SNAPSHOT</version>
+        <version>1.28.0-AR-000-unreasoned-export-for-non-isolated-SNAPSHOT</version>
     </parent>
 
     <artifactId>tinkar-maven-plugin</artifactId>
