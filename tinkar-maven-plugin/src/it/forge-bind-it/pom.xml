@@ -42,6 +42,26 @@
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
+					<execution>
+						<id>download-java-term-forge-template</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>dev.ikm.binding.forge.template</groupId>
+									<artifactId>term-java</artifactId>
+									<version>1.1.0</version>
+									<type>ftl</type>
+								</artifactItem>
+							</artifactItems>
+							<outputDirectory>${project.build.directory}/template</outputDirectory>
+							<overWriteReleases>false</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -50,9 +70,9 @@
 				<version>@project.version@</version>
 				<executions>
 					<execution>
-						<id>load-data</id>
+						<id>load-data-isolated</id>
 						<goals>
-							<goal>load-data</goal>
+							<goal>load-data-isolated</goal>
 						</goals>
 						<configuration>
 							<fileset>
@@ -65,21 +85,72 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>forge-binding</id>
+						<id>forge-binding-isolated</id>
 						<goals>
 							<goal>generate-binding-isolated</goal>
 						</goals>
 						<configuration>
-							<templateFiles>
-								<templateFile>test1.ftl</templateFile>
-								<templateFile>test2.ftl</templateFile>
-							</templateFiles>
+							<bindingOutput>TestTerm.java</bindingOutput>
+							<templateFile>term-java-1.1.0.ftl</templateFile>
 							<stringVariables>
 								<stringVariable>
 									<name>package</name>
 									<value>dev.ikm.tinkar.forge.test</value>
 								</stringVariable>
+								<stringVariable>
+									<name>author</name>
+									<value>Forge Test Author</value>
+								</stringVariable>
+								<stringVariable>
+									<name>className</name>
+									<value>TestTerm</value>
+								</stringVariable>
+								<stringVariable>
+									<name>namespace</name>
+									<value>f7ef93c7-97d6-4b52-a16e-f09877e3cf98</value>
+								</stringVariable>
 							</stringVariables>
+							<filter>
+								<memberships>
+									<membership>
+										<bindingName>TINKAR_BASE_MODEL_COMPONENT_PATTERN</bindingName>
+									</membership>
+								</memberships>
+								<statuses>
+									<status>
+										<bindingName>ACTIVE_STATE</bindingName>
+									</status>
+									<status>
+										<bindingName>INACTIVE_STATE</bindingName>
+									</status>
+								</statuses>
+								<path>
+									<bindingName>DEVELOPMENT_PATH</bindingName>
+								</path>
+								<useInferredDefinitions>true</useInferredDefinitions>
+								<language>
+									<bindingName>ENGLISH_LANGUAGE</bindingName>
+								</language>
+								<descriptionPattern>
+									<bindingName>DESCRIPTION_PATTERN</bindingName>
+								</descriptionPattern>
+								<descriptionTypePreferences>
+									<descriptionTypePreference>
+										<bindingName>REGULAR_NAME_DESCRIPTION_TYPE</bindingName>
+									</descriptionTypePreference>
+									<descriptionTypePreference>
+										<bindingName>FULLY_QUALIFIED_NAME_DESCRIPTION_TYPE</bindingName>
+									</descriptionTypePreference>
+								</descriptionTypePreferences>
+								<dialectPreferences>
+									<dialectPreference>
+										<bindingName>US_ENGLISH_DIALECT</bindingName>
+									</dialectPreference>
+									<dialectPreference>
+										<bindingName>GB_ENGLISH_DIALECT</bindingName>
+									</dialectPreference>
+								</dialectPreferences>
+							</filter>
 						</configuration>
 					</execution>
 				</executions>

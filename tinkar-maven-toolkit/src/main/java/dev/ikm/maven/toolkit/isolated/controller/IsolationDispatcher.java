@@ -1,5 +1,6 @@
 package dev.ikm.maven.toolkit.isolated.controller;
 
+import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.maven.toolkit.isolated.entity.LogInstant;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ public class IsolationDispatcher {
 
 	Logger LOG = LoggerFactory.getLogger(IsolationDispatcher.class.getSimpleName());
 
-	private final IsolatedTinkarMojo isolatedTinkarMojo;
+	private final TinkarMojo tinkarMojo;
 	private final IsolationFieldSerializer isolationFieldSerializer;
 	private String classPath;
 	private String canonicalName;
@@ -37,7 +38,7 @@ public class IsolationDispatcher {
 	private final Semaphore semaphore = new Semaphore(2);
 
 	private IsolationDispatcher(Builder builder) {
-		this.isolatedTinkarMojo = builder.isolatedTinkarMojo;
+		this.tinkarMojo = builder.tinkarMojo;
 		this.classPath = builder.classPath;
 		this.canonicalName = builder.canonicalName;
 		this.isolatedDirectory = builder.isolatedDirectory;
@@ -48,7 +49,7 @@ public class IsolationDispatcher {
 	 * Dispatch new instance of JVM and run Mojo
 	 */
 	public void dispatch() {
-		isolationFieldSerializer.discoverIsolatedFields(isolatedTinkarMojo);
+		isolationFieldSerializer.discoverIsolatedFields(tinkarMojo);
 		isolationFieldSerializer.serializeFields();
 
 		ProcessBuilder pb = new ProcessBuilder();
@@ -126,7 +127,7 @@ public class IsolationDispatcher {
 
 	public static class Builder {
 
-		private IsolatedTinkarMojo isolatedTinkarMojo;
+		private TinkarMojo tinkarMojo;
 		private Path isolatedDirectory;
 		private String classPath;
 		private List<File> dependencies;
@@ -136,8 +137,8 @@ public class IsolationDispatcher {
 		private final String suffix = ".if";
 
 
-		public Builder clazz(IsolatedTinkarMojo isolatedTinkarMojo) {
-			this.isolatedTinkarMojo = isolatedTinkarMojo;
+		public Builder clazz(TinkarMojo tinkarMojo) {
+			this.tinkarMojo = tinkarMojo;
 			return this;
 		}
 
@@ -162,7 +163,7 @@ public class IsolationDispatcher {
 		 * @return
 		 */
 		public IsolationDispatcher build() {
-			Objects.requireNonNull(isolatedTinkarMojo);
+			Objects.requireNonNull(tinkarMojo);
 			Objects.requireNonNull(buildDirectory);
 			Objects.requireNonNull(dependencies);
 
@@ -187,7 +188,7 @@ public class IsolationDispatcher {
 			//Create a directory for isolated fields
 			LocalTime localTime = LocalTime.now();
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-			isolatedDirectory = Path.of(buildDirectory.toString(), isolatedTinkarMojo.getClass().getSimpleName() + "-" + dateTimeFormatter.format(localTime));
+			isolatedDirectory = Path.of(buildDirectory.toString(), tinkarMojo.getClass().getSimpleName() + "-" + dateTimeFormatter.format(localTime));
 			try {
 				Files.createDirectories(isolatedDirectory);
 			} catch (IOException e) {

@@ -2,8 +2,12 @@ package dev.ikm.maven.bind;
 
 import dev.ikm.maven.bind.config.StringVariable;
 import dev.ikm.maven.export.config.ComponentFilter;
+import dev.ikm.maven.toolkit.DatastoreProxy;
 import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
+import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculatorWithCache;
+import dev.ikm.tinkar.coordinate.navigation.calculator.NavigationCalculatorWithCache;
+import dev.ikm.tinkar.coordinate.stamp.calculator.StampCalculator;
 import dev.ikm.tinkar.forge.Forge;
 import dev.ikm.tinkar.forge.TinkarForge;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -42,27 +46,34 @@ public class GenerateBindingIsolatedMojo extends IsolatedTinkarMojo {
 	@Override
 	public void handleIsolatedFields() {
 		//No handling
-		System.out.println("break");
 	}
 
 	@Override
 	public void run() {
-		filter.process();
+		getLog().info("Starting Forge...");
+
 		try (FileWriter fw = new FileWriter(bindingOutput)) {
 			Forge forge = new TinkarForge();
 			forge.config(templateDirectory.toPath());
 			for (StringVariable stringVariable : stringVariables) {
 				forge.variable(stringVariable.getName(), stringVariable.getValue());
 			}
-			forge.conceptData(filter.filterConcepts(), integer -> {});
-			forge.patternData(filter.filterPatterns(), integer -> {});
-			forge.variable("defaultSTAMPCalc", filter.getStampCalculator());
-			forge.variable("defaultLanguageCalc", filter.getLanguageCalculator());
-			forge.variable("defaultNavigationCalc", filter.getNavigationCalculator());
+
+			StampCalculator stampCalculator = filter.createStampCalculatorWithCache();
+			LanguageCalculatorWithCache languageCalculator = filter.createLanguageCalculatorWithCache();
+			NavigationCalculatorWithCache navigationCalculator = filter.createNavigationCalculatorWithCache();
+
+			forge.conceptData(filter.filterConcepts(), integer -> System.out.println("Concept " + languageCalculator.getDescriptionText(integer)));
+			forge.patternData(filter.filterPatterns(), integer -> System.out.println("Pattern " + languageCalculator.getDescriptionText(integer)));
+			forge.variable("defaultSTAMPCalc", stampCalculator);
+			forge.variable("defaultLanguageCalc", languageCalculator);
+			forge.variable("defaultNavigationCalc", navigationCalculator);
 			forge.template(templateFile.getName(), new BufferedWriter(fw));
 			forge.execute();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		getLog().info("Finished Forge....");
 	}
 }

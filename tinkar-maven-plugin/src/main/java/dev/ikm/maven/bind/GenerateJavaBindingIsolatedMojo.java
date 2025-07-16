@@ -18,6 +18,7 @@ package dev.ikm.maven.bind;
 import dev.ikm.maven.bind.config.CharacterReplacement;
 import dev.ikm.maven.bind.config.LanguageConfiguration;
 import dev.ikm.maven.bind.config.StampConfiguration;
+import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
 import dev.ikm.tinkar.common.service.PrimitiveData;
@@ -48,7 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 @Mojo(name = "generate-java-binding-isolated", defaultPhase = LifecyclePhase.PREPARE_PACKAGE)
-public class GenerateJavaBindingIsolatedMojo extends IsolatedTinkarMojo {
+public class GenerateJavaBindingIsolatedMojo extends TinkarMojo {
 
 	@Parameter(name = "bindingOutputFile", required = true)
 	private File bindingOutputFile;

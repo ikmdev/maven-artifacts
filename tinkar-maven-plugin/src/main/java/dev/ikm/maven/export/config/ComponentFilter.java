@@ -26,7 +26,6 @@ import dev.ikm.tinkar.coordinate.navigation.NavigationCoordinateRecord;
 import dev.ikm.tinkar.coordinate.navigation.calculator.NavigationCalculatorWithCache;
 import dev.ikm.tinkar.coordinate.stamp.StampCoordinateRecord;
 import dev.ikm.tinkar.coordinate.stamp.StateSet;
-import dev.ikm.tinkar.coordinate.stamp.calculator.Latest;
 import dev.ikm.tinkar.coordinate.stamp.calculator.StampCalculatorWithCache;
 import dev.ikm.tinkar.entity.ConceptEntity;
 import dev.ikm.tinkar.entity.ConceptEntityVersion;
@@ -35,15 +34,10 @@ import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.entity.EntityVersion;
 import dev.ikm.tinkar.entity.PatternEntity;
 import dev.ikm.tinkar.entity.PatternEntityVersion;
-import dev.ikm.tinkar.entity.StampEntity;
-import dev.ikm.tinkar.entity.StampEntityVersion;
 import dev.ikm.tinkar.terms.ConceptFacade;
-import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.PatternFacade;
 import dev.ikm.tinkar.terms.State;
 import dev.ikm.tinkar.terms.TinkarTerm;
-import org.antlr.v4.runtime.misc.IntSet;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.impl.factory.Lists;
 
@@ -57,9 +51,9 @@ import java.util.stream.Stream;
 public class ComponentFilter implements Serializable {
 
 	//STAMP Coordinate
-	private List<PublicIdConfig> memberships;
-	private List<PublicIdConfig> statuses;
-	private List<PublicIdConfig> modules;
+	private List<PublicIdConfig> memberships = new ArrayList<>();
+	private List<PublicIdConfig> statuses = new ArrayList<>();
+	private List<PublicIdConfig> modules = new ArrayList<>();
 	private PublicIdConfig path;
 
 	//Navigation Coordinate Fields
@@ -68,12 +62,9 @@ public class ComponentFilter implements Serializable {
 	//Language Coordinate Fields
 	private PublicIdConfig language;
 	private PublicIdConfig descriptionPattern;
-	private List<PublicIdConfig> descriptionTypePreference;
-	private List<PublicIdConfig> dialectPreference;
+	private List<PublicIdConfig> descriptionTypePreferences = new ArrayList<>();
+	private List<PublicIdConfig> dialectPreferences = new ArrayList<>();
 
-	private StampCalculatorWithCache stampCalculator;
-	private LanguageCalculatorWithCache languageCalculator;
-	private NavigationCalculatorWithCache navigationCalculator;
 
 	public List<PublicIdConfig> getMemberships() {
 		return memberships;
@@ -131,50 +122,20 @@ public class ComponentFilter implements Serializable {
 		this.descriptionPattern = descriptionPattern;
 	}
 
-	public List<PublicIdConfig> getDescriptionTypePreference() {
-		return descriptionTypePreference;
+	public List<PublicIdConfig> getDescriptionTypePreferences() {
+		return descriptionTypePreferences;
 	}
 
-	public void setDescriptionTypePreference(List<PublicIdConfig> descriptionTypePreference) {
-		this.descriptionTypePreference = descriptionTypePreference;
+	public void setDescriptionTypePreferences(List<PublicIdConfig> descriptionTypePreferences) {
+		this.descriptionTypePreferences = descriptionTypePreferences;
 	}
 
-	public List<PublicIdConfig> getDialectPreference() {
-		return dialectPreference;
+	public List<PublicIdConfig> getDialectPreferences() {
+		return dialectPreferences;
 	}
 
-	public void setDialectPreference(List<PublicIdConfig> dialectPreference) {
-		this.dialectPreference = dialectPreference;
-	}
-
-	public StampCalculatorWithCache getStampCalculator() {
-		return stampCalculator;
-	}
-
-	public void setStampCalculator(StampCalculatorWithCache stampCalculator) {
-		this.stampCalculator = stampCalculator;
-	}
-
-	public LanguageCalculatorWithCache getLanguageCalculator() {
-		return languageCalculator;
-	}
-
-	public void setLanguageCalculator(LanguageCalculatorWithCache languageCalculator) {
-		this.languageCalculator = languageCalculator;
-	}
-
-	public NavigationCalculatorWithCache getNavigationCalculator() {
-		return navigationCalculator;
-	}
-
-	public void setNavigationCalculator(NavigationCalculatorWithCache navigationCalculator) {
-		this.navigationCalculator = navigationCalculator;
-	}
-
-	public void process() {
-		this.stampCalculator = createStampCalculatorWithCache();
-		this. languageCalculator = createLanguageCalculatorWithCache();
-		this.navigationCalculator = createNavigationCalculatorWithCache();
+	public void setDialectPreferences(List<PublicIdConfig> dialectPreferences) {
+		this.dialectPreferences = dialectPreferences;
 	}
 
 	public List<PublicId> allowedMembershipsIds() {
@@ -240,10 +201,14 @@ public class ComponentFilter implements Serializable {
 	}
 
 	private StateSet createStateSet() {
+		if (statuses == null) {
+			return StateSet.ACTIVE_AND_INACTIVE;
+		}
+
 		List<State> states = new ArrayList<>();
 		for (PublicIdConfig publicIdConfig : statuses) {
 			ConceptFacade conceptFacade = publicIdConfig.getProxy();
-			State state = State.fromConcept(conceptFacade);
+			State state = State.fromConceptNid(conceptFacade.nid());
 			states.add(state);
 		}
 		return StateSet.make(states);
@@ -252,36 +217,71 @@ public class ComponentFilter implements Serializable {
 	private StampCoordinateRecord createStampCoordinateRecord() {
 		StateSet stateSet = createStateSet();
 
-		int pathNid = path.getProxy().nid();
+		int pathNid;
+		if (path == null) {
+			pathNid = TinkarTerm.DEVELOPMENT_PATH.nid();
+		} else {
+			pathNid = path.getProxy().nid();
+		}
 
 		Set<ConceptFacade> allowedModules = new HashSet<>();
-		for (PublicIdConfig publicIdConfig : modules) {
-			allowedModules.add(publicIdConfig.getProxy());
+		if (modules != null) {
+			for (PublicIdConfig publicIdConfig : modules) {
+				allowedModules.add(publicIdConfig.getProxy());
+			}
 		}
+
 		return StampCoordinateRecord.make(stateSet, pathNid, allowedModules);
 	}
 
 	private LanguageCoordinateRecord createLanguageCoordinateRecord() {
-		ConceptFacade languageConceptFacade = language.getProxy();
+
+		ConceptFacade languageConceptFacade;
+		if (language == null) {
+			languageConceptFacade = ConceptFacade.make(TinkarTerm.ENGLISH_LANGUAGE.nid());
+		} else {
+			languageConceptFacade = language.getProxy();
+		}
+
 		PatternFacade descriptionPatternFacade = descriptionPattern.getProxy();
-
-		int[] descriptionTypeNids = new int[descriptionTypePreference.size()];
-		for (int i = 0; i < descriptionTypePreference.size(); i++) {
-			descriptionTypeNids[i] = descriptionTypePreference.get(i).getProxy().nid();
+		if (descriptionPatternFacade == null) {
+			descriptionPatternFacade = PatternFacade.make(TinkarTerm.DESCRIPTION_PATTERN.nid());
+		} else {
+			descriptionPatternFacade = descriptionPattern.getProxy();
 		}
-		IntIdList descTypePrefList = IntIds.list.of(descriptionTypeNids);
 
-		int[] dialectPreferenceNids = new int[dialectPreference.size()];
-		for (int i = 0; i < dialectPreference.size(); i++) {
-			dialectPreferenceNids[i] = dialectPreference.get(i).getProxy().nid();
+		IntIdList descTypePrefList;
+		if (descriptionTypePreferences == null || descriptionTypePreferences.isEmpty()) {
+			descTypePrefList = IntIds.list.empty();
+		} else {
+			int[] descriptionTypeNids = new int[descriptionTypePreferences.size()];
+			for (int i = 0; i < descriptionTypePreferences.size(); i++) {
+				descriptionTypeNids[i] = descriptionTypePreferences.get(i).getProxy().nid();
+			}
+			descTypePrefList = IntIds.list.of(descriptionTypeNids);
 		}
-		IntIdList dialectPrefList = IntIds.list.of(dialectPreferenceNids);
 
-		int[] modulePreferenceNids = new int[modules.size()];
-		for (int i = 0; i < modules.size(); i++) {
-			modulePreferenceNids[i] = modules.get(i).getProxy().nid();
+		IntIdList dialectPrefList;
+		if (dialectPreferences == null || dialectPreferences.isEmpty()) {
+			dialectPrefList = IntIds.list.empty();
+		} else {
+			int[] dialectPreferenceNids = new int[dialectPreferences.size()];
+			for (int i = 0; i < dialectPreferences.size(); i++) {
+				dialectPreferenceNids[i] = dialectPreferences.get(i).getProxy().nid();
+			}
+			dialectPrefList = IntIds.list.of(dialectPreferenceNids);
 		}
-		IntIdList modulePrefList = IntIds.list.of(modulePreferenceNids);
+
+		IntIdList modulePrefList;
+		if (modules == null || modules.isEmpty()) {
+			modulePrefList = IntIds.list.empty();
+		} else {
+			int[] modulePreferenceNids = new int[modules.size()];
+			for (int i = 0; i < modules.size(); i++) {
+				modulePreferenceNids[i] = modules.get(i).getProxy().nid();
+			}
+			modulePrefList = IntIds.list.of(modulePreferenceNids);
+		}
 
 		return LanguageCoordinateRecord.make(languageConceptFacade,
 				descriptionPatternFacade,
@@ -301,19 +301,19 @@ public class ComponentFilter implements Serializable {
 		return NavigationCoordinateRecord.make(navigationPatternNids, stateSet, true, IntIds.list.empty());
 	}
 
-	private StampCalculatorWithCache createStampCalculatorWithCache() {
+	public StampCalculatorWithCache createStampCalculatorWithCache() {
 		StampCoordinateRecord stampCoordinateRecord = createStampCoordinateRecord();
 		return StampCalculatorWithCache.getCalculator(stampCoordinateRecord);
 	}
 
-	private LanguageCalculatorWithCache createLanguageCalculatorWithCache() {
+	public LanguageCalculatorWithCache createLanguageCalculatorWithCache() {
 		StampCoordinateRecord stampCoordinateRecord = createStampCoordinateRecord();
 		LanguageCoordinateRecord languageCoordinateRecord = createLanguageCoordinateRecord();
 		ImmutableList<LanguageCoordinateRecord> languageCoordinateRecords = Lists.immutable.of(languageCoordinateRecord);
 		return LanguageCalculatorWithCache.getCalculator(stampCoordinateRecord, languageCoordinateRecords);
 	}
 
-	private NavigationCalculatorWithCache createNavigationCalculatorWithCache() {
+	public NavigationCalculatorWithCache createNavigationCalculatorWithCache() {
 		StampCoordinateRecord stampCoordinateRecord = createStampCoordinateRecord();
 		LanguageCoordinateRecord languageCoordinateRecord = createLanguageCoordinateRecord();
 		NavigationCoordinateRecord navigationCoordinateRecord = createNavigationCoordinateRecord();

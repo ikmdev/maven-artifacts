@@ -69,10 +69,7 @@ public abstract class IsolatedTinkarMojo extends TinkarMojo {
 				throw new RuntimeException("Datastore not running");
 			}
 		} catch (Exception e) {
-			System.err.println(e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
-
-		Thread.sleep(3000); //FIXME-aks8m: This is to allow time for Lucene to release file lock
 	}
 }

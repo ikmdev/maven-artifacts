@@ -54,7 +54,7 @@ public class ExportTinkarDataMojo extends SimpleTinkarMojo {
         File exportFile = exportDirectory.toPath().resolve(fileName.getName()).toFile();
 
         ExportEntitiesToProtobufFile exportTask;
-		List<PublicId> membershipPublicIds = null;
+		List<PublicId> membershipPublicIds;
 		membershipPublicIds = filter.allowedMembershipsIds();
 
 		if (!membershipPublicIds.isEmpty()) {

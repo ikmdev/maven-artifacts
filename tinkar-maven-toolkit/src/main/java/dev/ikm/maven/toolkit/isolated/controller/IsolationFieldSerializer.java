@@ -1,5 +1,6 @@
 package dev.ikm.maven.toolkit.isolated.controller;
 
+import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.maven.toolkit.isolated.entity.IsolatedField;
@@ -33,13 +34,13 @@ public class IsolationFieldSerializer {
 
 	/**
 	 * Discover all fields that are annotated with @Isolate from concrete and parent classes
-	 * @param isolatedTinkarMojo
+	 * @param tinkarMojo
 	 */
-	public void discoverIsolatedFields(IsolatedTinkarMojo isolatedTinkarMojo) {
+	public void discoverIsolatedFields(TinkarMojo tinkarMojo) {
 		//Gather all fields from instance and parent classes
 		ArrayList<Field> fields = new ArrayList<>();
-		fields.addAll(Arrays.asList(isolatedTinkarMojo.getClass().getFields()));
-		fields.addAll(Arrays.asList(isolatedTinkarMojo.getClass().getDeclaredFields()));
+		fields.addAll(Arrays.asList(tinkarMojo.getClass().getFields()));
+		fields.addAll(Arrays.asList(tinkarMojo.getClass().getDeclaredFields()));
 
 		//Iterate over all fields and find the ones that are okay to be passed into an isolated JVM
 		isolatedFields.clear();
@@ -50,7 +51,7 @@ public class IsolationFieldSerializer {
 				})
 				.map(field -> {
 					try {
-						return new IsolatedField(field.getName(), field.get(isolatedTinkarMojo));
+						return new IsolatedField(field.getName(), field.get(tinkarMojo));
 					} catch (IllegalAccessException e) {
 						throw new RuntimeException(e);
 					}
