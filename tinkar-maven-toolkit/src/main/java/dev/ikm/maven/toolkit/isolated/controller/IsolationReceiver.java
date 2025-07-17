@@ -1,6 +1,6 @@
 package dev.ikm.maven.toolkit.isolated.controller;
 
-import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
+import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.entity.IsolatedField;
 
 import java.lang.reflect.Field;
@@ -25,34 +25,34 @@ public class IsolationReceiver {
 	 * Create a new instance of the Mojo based on it's canonical name that was passed in from the JVM process
 	 * @return
 	 */
-	public IsolatedTinkarMojo runnableInstance() {
-		IsolatedTinkarMojo isolatedTinkarMojo = null;
+	public TinkarMojo runnableInstance() {
+		TinkarMojo tinkarMojo = null;
 		try {
-			Class<IsolatedTinkarMojo> isolatedTinkarMojoClass = (Class<IsolatedTinkarMojo>) Class.forName(canonicalName);
-			 isolatedTinkarMojo = isolatedTinkarMojoClass.getDeclaredConstructor(null).newInstance(null);
+			Class<TinkarMojo> isolatedTinkarMojoClass = (Class<TinkarMojo>) Class.forName(canonicalName);
+			 tinkarMojo = isolatedTinkarMojoClass.getDeclaredConstructor(null).newInstance(null);
 		} catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException |
 				 ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
 		List<IsolatedField> isolatedFields = isolationFieldSerializer.deserializeIsolatedFields();
-		injectIsolatedFields(isolatedTinkarMojo, isolatedFields);
-		return isolatedTinkarMojo;
+		injectIsolatedFields(tinkarMojo, isolatedFields);
+		return tinkarMojo;
 	}
 
 	/**
 	 * Inject de-serialized fields into the new instance of the IsolatedMojo
-	 * @param isolatedTinkarMojo
+	 * @param tinkarMojo
 	 * @param isolatedFields
 	 */
-	private static void injectIsolatedFields(IsolatedTinkarMojo isolatedTinkarMojo, List<IsolatedField> isolatedFields) {
+	private static void injectIsolatedFields(TinkarMojo tinkarMojo, List<IsolatedField> isolatedFields) {
 		//Inject Isolated Fields into class fields (super)
-		Class<?> clazz =  isolatedTinkarMojo.getClass();
+		Class<?> clazz =  tinkarMojo.getClass();
 		for (Field field : clazz.getFields()) {
 			isolatedFields.forEach(isolatedField -> {
 				if (isolatedField.name().equals(field.getName())) {
 					field.setAccessible(true);
 					try {
-						field.set(isolatedTinkarMojo, isolatedField.object());
+						field.set(tinkarMojo, isolatedField.object());
 					} catch (IllegalAccessException e) {
 						throw new RuntimeException(e);
 					}
@@ -65,7 +65,7 @@ public class IsolationReceiver {
 				if (isolatedField.name().equals(field.getName())) {
 					field.setAccessible(true);
 					try {
-						field.set(isolatedTinkarMojo, isolatedField.object());
+						field.set(tinkarMojo, isolatedField.object());
 					} catch (IllegalAccessException e) {
 						throw new RuntimeException(e);
 					}

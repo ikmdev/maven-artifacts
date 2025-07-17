@@ -1,7 +1,6 @@
 package dev.ikm.maven.toolkit.isolated.controller;
 
 import dev.ikm.maven.toolkit.TinkarMojo;
-import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.maven.toolkit.isolated.entity.LogInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

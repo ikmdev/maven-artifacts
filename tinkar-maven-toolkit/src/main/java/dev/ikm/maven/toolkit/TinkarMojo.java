@@ -1,7 +1,6 @@
 package dev.ikm.maven.toolkit;
 
 import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
-import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
 import dev.ikm.maven.toolkit.isolated.controller.IsolationDispatcher;
 import dev.ikm.maven.toolkit.isolated.controller.IsolationReceiver;
 import dev.ikm.tinkar.common.service.ServiceProperties;
@@ -23,7 +22,7 @@ public abstract class TinkarMojo extends AbstractMojo implements Runnable {
 
 	private final static Logger LOG = LoggerFactory.getLogger(TinkarMojo.class.getSimpleName());
 
-	@Parameter(name = "isolate", defaultValue = "${true}")
+	@Parameter(name = "isolate", defaultValue = "true")
 	public boolean isolate;
 
 	@Parameter(readonly = true, defaultValue = "${plugin.artifacts}")
@@ -75,15 +74,15 @@ public abstract class TinkarMojo extends AbstractMojo implements Runnable {
 	 * @throws Exception
 	 */
 	public static void main(String... args) throws Exception {
-		LOG.info("fork: " + ServiceProperties.jvmUuid());
+		LOG.info("isolate: " + ServiceProperties.jvmUuid());
 		IsolationReceiver isolationReceiver = new IsolationReceiver(args[0], args[1]);
-		IsolatedTinkarMojo isolatedTinkarMojo = isolationReceiver.runnableInstance();
+		TinkarMojo tinkarMojo= isolationReceiver.runnableInstance();
 		LOG.info("isolated directory: " + args[0]);
 		LOG.info("class path: " + args[1]);
 
-		try (DatastoreProxy datastoreProxy = new DatastoreProxy(isolatedTinkarMojo.dataStore)) {
+		try (DatastoreProxy datastoreProxy = new DatastoreProxy(tinkarMojo.dataStore)) {
 			if (datastoreProxy.running()) {
-				isolatedTinkarMojo.run();
+				tinkarMojo.run();
 			} else {
 				throw new RuntimeException("Datastore not running");
 			}

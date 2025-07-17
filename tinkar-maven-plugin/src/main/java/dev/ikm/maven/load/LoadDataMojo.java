@@ -1,22 +1,7 @@
-/*
- * Copyright © 2015 Integrated Knowledge Management (support@ikm.dev)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package dev.ikm.maven.load;
 
-import dev.ikm.maven.toolkit.isolated.boundary.IsolatedTinkarMojo;
-import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.TinkarMojo;
+import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.tinkar.entity.load.LoadEntitiesFromProtobufFile;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -26,37 +11,46 @@ import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 @Mojo(name = "load-data", requiresDependencyResolution = ResolutionScope.RUNTIME_PLUS_SYSTEM, defaultPhase = LifecyclePhase.GENERATE_RESOURCES)
-public class LoadDataMojo extends SimpleTinkarMojo {
+public class LoadDataMojo extends TinkarMojo {
 
-    private final FileSetManager fileSetManager = new FileSetManager();
+	private final FileSetManager fileSetManager = new FileSetManager();
 
-    @Parameter(name= "filesets")
-    private FileSet[] filesets;
+	@Parameter(name= "filesets")
+	private FileSet[] filesets;
 
-    @Parameter(name = "fileset")
-    private FileSet fileset;
+	@Parameter(name = "fileset")
+	private FileSet fileset;
 
-    @Override
-    public void run() {
-        if (filesets != null) {
-            for (FileSet fileSet : filesets) {
-               loadFileset(fileSet);
-            }
-        }
-        if (fileset != null) {
-           loadFileset(fileset);
-        }
-    }
+	@Isolate
+	private List<File> filesToLoad = new ArrayList<>();
 
+	@Override
+	public void handleIsolatedFields() {
+		if (filesets != null) {
+			for (FileSet innerFileSet : filesets) {
+				for (String includeFile : fileSetManager.getIncludedFiles(innerFileSet)) {
+					File pbZip = new File(innerFileSet.getDirectory(), includeFile);
+					filesToLoad.add(pbZip);
+				}
+			}
+		}
+		if (fileset != null) {
+			for (String includeFile : fileSetManager.getIncludedFiles(fileset)) {
+				File pbZip = new File(fileset.getDirectory(), includeFile);
+				filesToLoad.add(pbZip);
+			}
+		}
+	}
 
-
-    private void loadFileset(FileSet fileset) {
-        for (String includeFile : fileSetManager.getIncludedFiles(fileset)) {
-            File pbZip = new File(fileset.getDirectory(), includeFile);
-            var loadTask = new LoadEntitiesFromProtobufFile(pbZip);
-            loadTask.compute();
-        }
-    }
+	@Override
+	public void run() {
+		filesToLoad.forEach(file -> {
+			var loadTask = new LoadEntitiesFromProtobufFile(file);
+			loadTask.compute();
+		});
+	}
 }

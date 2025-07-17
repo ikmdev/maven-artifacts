@@ -16,11 +16,10 @@
 package dev.ikm.maven.export;
 
 import dev.ikm.maven.export.config.ComponentFilter;
-import dev.ikm.maven.export.config.PublicIdConfig;
-import dev.ikm.maven.toolkit.simple.boundary.SimpleTinkarMojo;
+import dev.ikm.maven.toolkit.TinkarMojo;
+import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -28,20 +27,28 @@ import org.apache.maven.plugins.annotations.Parameter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 
 @Mojo(name = "export-tinkar-data", defaultPhase = LifecyclePhase.PACKAGE)
-public class ExportTinkarDataMojo extends SimpleTinkarMojo {
+public class ExportTinkarDataMojo extends TinkarMojo {
 
+    @Isolate
     @Parameter(name = "exportDirectory", defaultValue = "${project.build.directory}")
     File exportDirectory;
 
+    @Isolate
     @Parameter(name = "fileName", defaultValue = "tinkar-export.zip")
     File fileName;
 
+    @Isolate
     @Parameter(name = "filter", defaultValue = "${new ArrayList<ComponentFilter>()}")
     ComponentFilter filter;
+
+
+    @Override
+    public void handleIsolatedFields() {
+       //No extra field isolation handling needed
+    }
 
     @Override
     public void run() {
