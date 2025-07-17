@@ -15,19 +15,20 @@
  */
 package dev.ikm.maven.export;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
 import dev.ikm.maven.export.config.ComponentFilter;
 import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
 
 @Mojo(name = "export-tinkar-data", defaultPhase = LifecyclePhase.PACKAGE)
 public class ExportTinkarDataMojo extends TinkarMojo {
