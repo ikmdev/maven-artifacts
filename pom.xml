@@ -47,7 +47,7 @@
         <tinkar-core.group.id>dev.ikm.tinkar</tinkar-core.group.id>
         <tinkar-core.version>1.117.0</tinkar-core.version>
         <tinkar-starter-data.version>1.0.0</tinkar-starter-data.version>
-        <forge.version>1.4.0</forge.version>
+        <forge.version>1.5.0</forge.version>
         <maven-project.version>2.2.1</maven-project.version>
         <file-management.version>3.2.0</file-management.version>
         <plexus-container-defualt.version>2.1.0</plexus-container-defualt.version>

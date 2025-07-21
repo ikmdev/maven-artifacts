@@ -62,15 +62,15 @@ public class GenerateBindingMojo extends TinkarMojo {
 			LanguageCalculatorWithCache languageCalculator = filter.createLanguageCalculatorWithCache();
 			NavigationCalculatorWithCache navigationCalculator = filter.createNavigationCalculatorWithCache();
 
-			forge.conceptData(filter.filterConcepts(), integer -> System.out.println("Concept " + languageCalculator.getDescriptionText(integer)));
-			forge.patternData(filter.filterPatterns(), integer -> System.out.println("Pattern " + languageCalculator.getDescriptionText(integer)));
+			forge.conceptData(filter.filterConcepts(languageCalculator), nid -> getLog().info("Concept: " + languageCalculator.getDescriptionTextOrNid(nid)));
+			forge.patternData(filter.filterPatterns(languageCalculator), nid -> getLog().info("Pattern: " + languageCalculator.getDescriptionTextOrNid(nid)));
 			forge.variable("defaultSTAMPCalc", stampCalculator);
 			forge.variable("defaultLanguageCalc", languageCalculator);
 			forge.variable("defaultNavigationCalc", navigationCalculator);
 			forge.template(templateFile.getName(), new BufferedWriter(fw));
 			forge.execute();
 		} catch (IOException e) {
-			e.printStackTrace();
+			getLog().error(e);
 		}
 
 		getLog().info("Finished Forge....");

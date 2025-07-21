@@ -21,6 +21,7 @@ import dev.ikm.tinkar.common.id.IntIds;
 import dev.ikm.tinkar.common.id.PublicId;
 import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.coordinate.language.LanguageCoordinateRecord;
+import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculator;
 import dev.ikm.tinkar.coordinate.language.calculator.LanguageCalculatorWithCache;
 import dev.ikm.tinkar.coordinate.navigation.NavigationCoordinateRecord;
 import dev.ikm.tinkar.coordinate.navigation.calculator.NavigationCalculatorWithCache;
@@ -34,6 +35,7 @@ import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.entity.EntityVersion;
 import dev.ikm.tinkar.entity.PatternEntity;
 import dev.ikm.tinkar.entity.PatternEntityVersion;
+import dev.ikm.tinkar.forge.wrapper.of.TextOf;
 import dev.ikm.tinkar.terms.ConceptFacade;
 import dev.ikm.tinkar.terms.PatternFacade;
 import dev.ikm.tinkar.terms.State;
@@ -43,9 +45,12 @@ import org.eclipse.collections.impl.factory.Lists;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class ComponentFilter implements Serializable {
@@ -64,6 +69,8 @@ public class ComponentFilter implements Serializable {
 	private PublicIdConfig descriptionPattern;
 	private List<PublicIdConfig> descriptionTypePreferences = new ArrayList<>();
 	private List<PublicIdConfig> dialectPreferences = new ArrayList<>();
+
+	private final TextOf textOf = new TextOf();
 
 
 	public List<PublicIdConfig> getMemberships() {
@@ -156,12 +163,13 @@ public class ComponentFilter implements Serializable {
 				.toList();
 	}
 
-	public Stream<ConceptEntity<? extends ConceptEntityVersion>> filterConcepts() {
-		Stream.Builder<ConceptEntity<? extends ConceptEntityVersion>> builder = Stream.builder();
+	public Stream<ConceptEntity<? extends ConceptEntityVersion>> filterConcepts(LanguageCalculator languageCalculator) {
+		Map<String, ConceptEntity<? extends ConceptEntityVersion>> concepts = new TreeMap<>();
 		if (memberships.isEmpty()) {
 			PrimitiveData.get().forEachConceptNid(conceptNid -> {
 				Entity<? extends EntityVersion> conceptEntity = Entity.getFast(conceptNid);
-				builder.add((ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
+				String description = textOf.createDescription(conceptEntity, languageCalculator);
+				concepts.put(description, (ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
 			});
 		} else {
 			PrimitiveData.get().forEachConceptNid(conceptNid -> {
@@ -170,20 +178,22 @@ public class ComponentFilter implements Serializable {
 							int[] membershipSemantics = EntityService.get().semanticNidsForComponentOfPattern(conceptNid, membershipPatternNid);
 							if (membershipSemantics.length > 0) {
 								Entity<? extends EntityVersion> conceptEntity = Entity.getFast(conceptNid);
-								builder.add((ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
+								String description = textOf.createDescription(conceptEntity, languageCalculator);
+								concepts.put(description, (ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
 							}
 						});
 			});
 		}
-		return builder.build();
+		return concepts.values().stream();
 	}
 
-	public Stream<PatternEntity<? extends PatternEntityVersion>> filterPatterns() {
-		Stream.Builder<PatternEntity<? extends PatternEntityVersion>> builder = Stream.builder();
+	public Stream<PatternEntity<? extends PatternEntityVersion>> filterPatterns(LanguageCalculator languageCalculator) {
+		Map<String, PatternEntity<? extends PatternEntityVersion>> patterns = new TreeMap<>();
 		if (memberships.isEmpty()) {
 			PrimitiveData.get().forEachPatternNid(patternNid -> {
 				Entity<? extends EntityVersion> patternEntity = Entity.getFast(patternNid);
-				builder.add((PatternEntity<? extends PatternEntityVersion>) patternEntity);
+				String description = textOf.createDescription(patternEntity, languageCalculator);
+				patterns.put(description, (PatternEntity<? extends PatternEntityVersion>) patternEntity);
 			});
 		} else {
 			PrimitiveData.get().forEachPatternNid(patternNid -> {
@@ -192,12 +202,13 @@ public class ComponentFilter implements Serializable {
 							int[] membershipSemantics = EntityService.get().semanticNidsForComponentOfPattern(patternNid, membershipPatternNid);
 							if (membershipSemantics.length > 0) {
 								Entity<? extends EntityVersion> patternEntity = Entity.getFast(patternNid);
-								builder.add((PatternEntity<? extends PatternEntityVersion>) patternEntity);
+								String description = textOf.createDescription(patternEntity, languageCalculator);
+								patterns.put(description, (PatternEntity<? extends PatternEntityVersion>) patternEntity);
 							}
 						});
 			});
 		}
-		return builder.build();
+		return patterns.values().stream();
 	}
 
 	private StateSet createStateSet() {
