@@ -35,7 +35,7 @@ import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.entity.EntityVersion;
 import dev.ikm.tinkar.entity.PatternEntity;
 import dev.ikm.tinkar.entity.PatternEntityVersion;
-import dev.ikm.tinkar.forge.wrapper.of.TextOf;
+import dev.ikm.tinkar.forge.ForgeUtil;
 import dev.ikm.tinkar.terms.ConceptFacade;
 import dev.ikm.tinkar.terms.PatternFacade;
 import dev.ikm.tinkar.terms.State;
@@ -68,9 +68,6 @@ public class ComponentFilter implements Serializable {
 	private PublicIdConfig descriptionPattern;
 	private List<PublicIdConfig> descriptionTypePreferences = new ArrayList<>();
 	private List<PublicIdConfig> dialectPreferences = new ArrayList<>();
-
-	private final TextOf textOf = new TextOf();
-
 
 	public List<PublicIdConfig> getMemberships() {
 		return memberships;
@@ -167,7 +164,7 @@ public class ComponentFilter implements Serializable {
 		if (memberships.isEmpty()) {
 			PrimitiveData.get().forEachConceptNid(conceptNid -> {
 				Entity<? extends EntityVersion> conceptEntity = Entity.getFast(conceptNid);
-				String description = textOf.createDescription(conceptEntity, languageCalculator);
+				String description = ForgeUtil.createBindingDescription(conceptEntity, languageCalculator);
 				concepts.put(description, (ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
 			});
 		} else {
@@ -177,7 +174,7 @@ public class ComponentFilter implements Serializable {
 							int[] membershipSemantics = EntityService.get().semanticNidsForComponentOfPattern(conceptNid, membershipPatternNid);
 							if (membershipSemantics.length > 0) {
 								Entity<? extends EntityVersion> conceptEntity = Entity.getFast(conceptNid);
-								String description = textOf.createDescription(conceptEntity, languageCalculator);
+								String description = ForgeUtil.createBindingDescription(conceptEntity, languageCalculator);
 								concepts.put(description, (ConceptEntity<? extends ConceptEntityVersion>) conceptEntity);
 							}
 						});
@@ -191,7 +188,7 @@ public class ComponentFilter implements Serializable {
 		if (memberships.isEmpty()) {
 			PrimitiveData.get().forEachPatternNid(patternNid -> {
 				Entity<? extends EntityVersion> patternEntity = Entity.getFast(patternNid);
-				String description = textOf.createDescription(patternEntity, languageCalculator);
+				String description = ForgeUtil.createBindingDescription(patternEntity, languageCalculator);
 				patterns.put(description, (PatternEntity<? extends PatternEntityVersion>) patternEntity);
 			});
 		} else {
@@ -201,7 +198,7 @@ public class ComponentFilter implements Serializable {
 							int[] membershipSemantics = EntityService.get().semanticNidsForComponentOfPattern(patternNid, membershipPatternNid);
 							if (membershipSemantics.length > 0) {
 								Entity<? extends EntityVersion> patternEntity = Entity.getFast(patternNid);
-								String description = textOf.createDescription(patternEntity, languageCalculator);
+								String description = ForgeUtil.createBindingDescription(patternEntity, languageCalculator);
 								patterns.put(description, (PatternEntity<? extends PatternEntityVersion>) patternEntity);
 							}
 						});
