@@ -22,7 +22,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.shared.model.fileset.FileSet;
 import org.apache.maven.shared.model.fileset.util.FileSetManager;
 
@@ -47,9 +46,6 @@ public class VerifyPBExport extends TinkarMojo {
 
 	@Parameter(name = "fileset")
 	private FileSet fileset;
-
-	@Parameter(defaultValue = "${project}")
-	private MavenProject project;
 
 	@Isolate
 	private List<File> filesToLoad = new ArrayList<>();
@@ -79,6 +75,7 @@ public class VerifyPBExport extends TinkarMojo {
 		}
 		filesToLoad.forEach(file -> {
 			var loadTask = new LoadEntitiesFromProtobufFile(file);
+			loadTask.compute();
 		});
 
 		StringBuilder sb = new StringBuilder();
@@ -92,25 +89,7 @@ public class VerifyPBExport extends TinkarMojo {
 
 		if (!entities.isEmpty()) {
 			failed = true;
-			sb.append("\nFound Null Stamp references\n");
-			entities.forEach(entity -> {
-				StampEntity<? extends StampEntityVersion> e = (StampEntity) entity;
-				sb.append("  Stamp with PublicId " + e.publicId() + "\n");
-				e.versions().stream().forEach(version -> {
-					if (DataIntegrity.referencedEntityIsNull(version.stateNid())) {
-						sb.append("    null state entity with nid " + version.stateNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.authorNid())) {
-						sb.append("    null author entity with nid " + version.authorNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.moduleNid())) {
-						sb.append("    null module entity with nid " + version.moduleNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.pathNid())) {
-						sb.append("    null path entity with nid " + version.pathNid() + "\n");
-					}
-				});
-			});
+			buildStampRefs(sb, entities);
 		}
 
 		entities = DataIntegrity.validateConceptReferences(aggregatedNullNidList);
@@ -118,19 +97,7 @@ public class VerifyPBExport extends TinkarMojo {
 
 		if (!entities.isEmpty()) {
 			failed = true;
-			sb.append("\nFound Null Concept references\n");
-			entities.forEach(entity -> {
-				ConceptEntity<? extends ConceptEntityVersion> e = (ConceptEntity) entity;
-				sb.append("  Concept with PublicId " + e.publicId() + "\n");
-				e.versions().stream().forEach(version -> {
-					if (DataIntegrity.referencedEntityIsNull(version.nid())) {
-						sb.append("    null version entity with nid " + version.nid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
-						sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
-					}
-				});
-			});
+			buildConceptRefs(sb, entities);
 		}
 
 		entities = DataIntegrity.validateSemanticReferences(aggregatedNullNidList);
@@ -138,58 +105,7 @@ public class VerifyPBExport extends TinkarMojo {
 
 		if (!entities.isEmpty()) {
 			failed = true;
-			sb.append("\nFound Null Semantic references\n");
-			entities.forEach(entity -> {
-				SemanticEntity<? extends SemanticEntityVersion> e = (SemanticEntity) entity;
-				sb.append("  Semantic with PublicId " + e.publicId() + "\n");
-				e.versions().stream().forEach(version -> {
-					if (DataIntegrity.referencedEntityIsNull(version.nid())) {
-						sb.append("    null version entity with nid " + version.nid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
-						sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.patternNid())) {
-						sb.append("    null pattern entity with nid " + version.patternNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.referencedComponentNid())) {
-						sb.append("    null referenced component entity with nid " + version.referencedComponentNid() + "\n");
-					} else {
-						try {
-							sb.append("    referenced component entity " + version.referencedComponent() + "\n");
-						} catch (Exception ex) {
-							// ignore possible toString errors
-						}
-					}
-
-					try {
-						sb.append("    version field values " + version.fieldValues() + "\n");
-					} catch (Exception ex) {
-						// ignore possible toString errors
-					}
-					version.fieldValues().forEach(fieldVal -> {
-						if (fieldVal instanceof IntIdSet nidSet) {
-							nidSet.forEach(nid -> {
-								if (DataIntegrity.referencedEntityIsNull(nid)) {
-									sb.append("    null entry in field value of type IntIdSet " + nid + "\n");
-								}
-							});
-						} else if (fieldVal instanceof IntIdList nidList) {
-							nidList.forEach(nid -> {
-								if (DataIntegrity.referencedEntityIsNull(nid)) {
-									sb.append("    null entry in field value of type IntIdList " + nid + "\n");
-								}
-							});
-						} else if (fieldVal instanceof PublicId pubId) {
-							try {
-								EntityService.get().getEntity(pubId.asUuidList());
-							} catch (NullPointerException ex) {
-								sb.append("    null entry in field value of type PublicId " + fieldVal + "\n");
-							}
-						}
-					});
-				});
-			});
+			buildSemanticRefs(sb, entities);
 		}
 
 		entities = DataIntegrity.validatePatternReferences(aggregatedNullNidList);
@@ -197,43 +113,7 @@ public class VerifyPBExport extends TinkarMojo {
 
 		if (!entities.isEmpty()) {
 			failed = true;
-			sb.append("\nFound Null Pattern references\n");
-			entities.forEach(entity -> {
-				PatternEntity<? extends PatternEntityVersion> e = (PatternEntity) entity;
-				sb.append("  Pattern with PublicId " + e.publicId() + "\n");
-
-				try {
-					sb.append("  Pattern entity  " + e + "\n");
-				} catch (Exception exc) {
-					// catching exception and ignoring potential NullPointerException during toString
-				}
-				e.versions().stream().forEach(version -> {
-					if (DataIntegrity.referencedEntityIsNull(version.nid())) {
-						sb.append("    null version entity with nid " + version.nid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
-						sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.semanticMeaningNid())) {
-						sb.append("    null semantic meaning entity with nid " + version.semanticMeaningNid() + "\n");
-					}
-					if (DataIntegrity.referencedEntityIsNull(version.semanticPurposeNid())) {
-						sb.append("    null semantic purpose entity with nid " + version.semanticPurposeNid() + "\n");
-					}
-
-					version.fieldDefinitions().forEach(fieldDef -> {
-						if (DataIntegrity.referencedEntityIsNull(fieldDef.dataTypeNid())) {
-							sb.append("    null data type in field definition " + fieldDef.dataTypeNid() + "\n");
-						}
-						if (DataIntegrity.referencedEntityIsNull(fieldDef.meaningNid())) {
-							sb.append("    null meaning in field definition " + fieldDef.meaningNid() + "\n");
-						}
-						if (DataIntegrity.referencedEntityIsNull(fieldDef.purposeNid())) {
-							sb.append("    null purpose in field definition " + fieldDef.purposeNid() + "\n");
-						}
-					});
-				});
-			});
+			buildPatternRefs(sb, entities);
 		}
 
 		if (failed) {
@@ -253,5 +133,138 @@ public class VerifyPBExport extends TinkarMojo {
 			getLog().error("VerifyPBExport failed due to null references. See this file for more details " + reportFile);
 			System.exit(IsolationDispatcher.VERIFY_EXIT_CODE);
 		}
+	}
+
+	private void buildStampRefs(StringBuilder sb, List<? extends Entity> entities) {
+		sb.append("\nFound Null Stamp references\n");
+		entities.forEach(entity -> {
+			StampEntity<? extends StampEntityVersion> e = (StampEntity) entity;
+			sb.append("  Stamp with PublicId " + e.publicId() + "\n");
+			e.versions().stream().forEach(version -> {
+				if (DataIntegrity.referencedEntityIsNull(version.stateNid())) {
+					sb.append("    null state entity with nid " + version.stateNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.authorNid())) {
+					sb.append("    null author entity with nid " + version.authorNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.moduleNid())) {
+					sb.append("    null module entity with nid " + version.moduleNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.pathNid())) {
+					sb.append("    null path entity with nid " + version.pathNid() + "\n");
+				}
+			});
+		});
+	}
+
+	private void buildConceptRefs(StringBuilder sb, List<? extends Entity> entities) {
+		sb.append("\nFound Null Concept references\n");
+		entities.forEach(entity -> {
+			ConceptEntity<? extends ConceptEntityVersion> e = (ConceptEntity) entity;
+			sb.append("  Concept with PublicId " + e.publicId() + "\n");
+			e.versions().stream().forEach(version -> {
+				if (DataIntegrity.referencedEntityIsNull(version.nid())) {
+					sb.append("    null version entity with nid " + version.nid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
+					sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
+				}
+			});
+		});
+	}
+
+	private void buildSemanticRefs(StringBuilder sb, List<? extends Entity> entities) {
+		sb.append("\nFound Null Semantic references\n");
+		entities.forEach(entity -> {
+			SemanticEntity<? extends SemanticEntityVersion> e = (SemanticEntity) entity;
+			sb.append("  Semantic with PublicId " + e.publicId() + "\n");
+			e.versions().stream().forEach(version -> {
+				if (DataIntegrity.referencedEntityIsNull(version.nid())) {
+					sb.append("    null version entity with nid " + version.nid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
+					sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.patternNid())) {
+					sb.append("    null pattern entity with nid " + version.patternNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.referencedComponentNid())) {
+					sb.append("    null referenced component entity with nid " + version.referencedComponentNid() + "\n");
+				} else {
+					try {
+						sb.append("    referenced component entity " + version.referencedComponent() + "\n");
+					} catch (Exception ex) {
+						// ignore possible toString errors
+					}
+				}
+
+				try {
+					sb.append("    version field values " + version.fieldValues() + "\n");
+				} catch (Exception ex) {
+					// ignore possible toString errors
+				}
+				version.fieldValues().forEach(fieldVal -> {
+					if (fieldVal instanceof IntIdSet nidSet) {
+						nidSet.forEach(nid -> {
+							if (DataIntegrity.referencedEntityIsNull(nid)) {
+								sb.append("    null entry in field value of type IntIdSet " + nid + "\n");
+							}
+						});
+					} else if (fieldVal instanceof IntIdList nidList) {
+						nidList.forEach(nid -> {
+							if (DataIntegrity.referencedEntityIsNull(nid)) {
+								sb.append("    null entry in field value of type IntIdList " + nid + "\n");
+							}
+						});
+					} else if (fieldVal instanceof PublicId pubId) {
+						try {
+							EntityService.get().getEntity(pubId.asUuidList());
+						} catch (NullPointerException ex) {
+							sb.append("    null entry in field value of type PublicId " + fieldVal + "\n");
+						}
+					}
+				});
+			});
+		});
+	}
+
+	private void buildPatternRefs(StringBuilder sb, List<? extends Entity> entities) {
+		sb.append("\nFound Null Pattern references\n");
+		entities.forEach(entity -> {
+			PatternEntity<? extends PatternEntityVersion> e = (PatternEntity) entity;
+			sb.append("  Pattern with PublicId " + e.publicId() + "\n");
+
+			try {
+				sb.append("  Pattern entity  " + e + "\n");
+			} catch (Exception exc) {
+				// catching exception and ignoring potential NullPointerException during toString
+			}
+			e.versions().stream().forEach(version -> {
+				if (DataIntegrity.referencedEntityIsNull(version.nid())) {
+					sb.append("    null version entity with nid " + version.nid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.stampNid())) {
+					sb.append("    null stamp entity with nid " + version.stampNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.semanticMeaningNid())) {
+					sb.append("    null semantic meaning entity with nid " + version.semanticMeaningNid() + "\n");
+				}
+				if (DataIntegrity.referencedEntityIsNull(version.semanticPurposeNid())) {
+					sb.append("    null semantic purpose entity with nid " + version.semanticPurposeNid() + "\n");
+				}
+
+				version.fieldDefinitions().forEach(fieldDef -> {
+					if (DataIntegrity.referencedEntityIsNull(fieldDef.dataTypeNid())) {
+						sb.append("    null data type in field definition " + fieldDef.dataTypeNid() + "\n");
+					}
+					if (DataIntegrity.referencedEntityIsNull(fieldDef.meaningNid())) {
+						sb.append("    null meaning in field definition " + fieldDef.meaningNid() + "\n");
+					}
+					if (DataIntegrity.referencedEntityIsNull(fieldDef.purposeNid())) {
+						sb.append("    null purpose in field definition " + fieldDef.purposeNid() + "\n");
+					}
+				});
+			});
+		});
 	}
 }
