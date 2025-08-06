@@ -10,11 +10,13 @@ Architecture Team
 
 Required for running this:
 
-1. Download and install Java 23 (Azul)
+1. Download and install Java 24 (Azul)
+2. Download and install Apache Maven 3.9.11 or later
+3. Download and install Git
 
 ## Building and Running
 
-Follow the steps below to build and run Komet on your local machine:
+Follow the steps below to build and run maven-artifacts on your local machine:
 
 1. Clone the repository from GitHub to your local machine 
 
