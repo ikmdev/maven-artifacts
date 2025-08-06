@@ -80,12 +80,10 @@ public class VerifyPBExport extends TinkarMojo {
 
 		StringBuilder sb = new StringBuilder();
 
-		Map<String, List<? extends Entity>> typeNameEntityMap = new HashMap<>();
 		List<Integer> aggregatedNullNidList = new ArrayList<>();
 		boolean failed = false;
 
 		List<? extends Entity> entities = DataIntegrity.validateStampReferences(aggregatedNullNidList);
-		typeNameEntityMap.put("Stamp", entities);
 
 		if (!entities.isEmpty()) {
 			failed = true;
@@ -93,7 +91,6 @@ public class VerifyPBExport extends TinkarMojo {
 		}
 
 		entities = DataIntegrity.validateConceptReferences(aggregatedNullNidList);
-		typeNameEntityMap.put("Concept", entities);
 
 		if (!entities.isEmpty()) {
 			failed = true;
@@ -101,7 +98,6 @@ public class VerifyPBExport extends TinkarMojo {
 		}
 
 		entities = DataIntegrity.validateSemanticReferences(aggregatedNullNidList);
-		typeNameEntityMap.put("Semantic", entities);
 
 		if (!entities.isEmpty()) {
 			failed = true;
@@ -109,7 +105,6 @@ public class VerifyPBExport extends TinkarMojo {
 		}
 
 		entities = DataIntegrity.validatePatternReferences(aggregatedNullNidList);
-		typeNameEntityMap.put("Pattern", entities);
 
 		if (!entities.isEmpty()) {
 			failed = true;
