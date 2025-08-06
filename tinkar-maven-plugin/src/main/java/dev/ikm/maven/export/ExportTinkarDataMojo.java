@@ -15,20 +15,24 @@
  */
 package dev.ikm.maven.export;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.List;
-
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-
 import dev.ikm.maven.export.config.ComponentFilter;
 import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.boundary.Isolate;
 import dev.ikm.tinkar.common.id.PublicId;
+import dev.ikm.tinkar.entity.aggregator.DefaultEntityAggregator;
+import dev.ikm.tinkar.entity.aggregator.EntityAggregator;
+import dev.ikm.tinkar.entity.aggregator.InferredEntityAggregatorFilter;
+import dev.ikm.tinkar.entity.aggregator.MembershipEntityAggregator;
+import dev.ikm.tinkar.entity.aggregator.MembershipSemanticAggregatorFilter;
 import dev.ikm.tinkar.entity.export.ExportEntitiesToProtobufFile;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 @Mojo(name = "export-tinkar-data", defaultPhase = LifecyclePhase.PACKAGE)
 public class ExportTinkarDataMojo extends TinkarMojo {
@@ -40,6 +44,10 @@ public class ExportTinkarDataMojo extends TinkarMojo {
     @Isolate
     @Parameter(name = "fileName", defaultValue = "tinkar-export.zip")
     File fileName;
+
+    @Isolate
+    @Parameter(name = "unreasoned", defaultValue = "false")
+    boolean unreasoned;
 
     @Isolate
     @Parameter(name = "filter", defaultValue = "${new ArrayList<ComponentFilter>()}")
@@ -59,17 +67,21 @@ public class ExportTinkarDataMojo extends TinkarMojo {
             getLog().debug(e);
             throw  new RuntimeException(e);
         }
+
         File exportFile = exportDirectory.toPath().resolve(fileName.getName()).toFile();
+		List<PublicId> membershipPublicIds = filter.allowedMembershipsIds();
 
-        ExportEntitiesToProtobufFile exportTask;
-		List<PublicId> membershipPublicIds;
-		membershipPublicIds = filter.allowedMembershipsIds();
-
-		if (!membershipPublicIds.isEmpty()) {
-            exportTask = new ExportEntitiesToProtobufFile(exportFile, membershipPublicIds);
-        } else {
-            exportTask = new ExportEntitiesToProtobufFile(exportFile);
+        EntityAggregator entityAggregator = new DefaultEntityAggregator();
+        if (!membershipPublicIds.isEmpty()) {
+            // Membership Export with other Membership Semantics filtered out
+            entityAggregator = new MembershipSemanticAggregatorFilter(new MembershipEntityAggregator(membershipPublicIds), membershipPublicIds);
         }
+        if (unreasoned) {
+            // Filter out Inferred Semantics (i.e., Semantics produced by Reasoner)
+            entityAggregator = new InferredEntityAggregatorFilter(entityAggregator);
+        }
+
+        ExportEntitiesToProtobufFile exportTask = new ExportEntitiesToProtobufFile(exportFile, entityAggregator);
         exportTask.compute();
     }
 }
