@@ -114,6 +114,11 @@
                 <version>${tinkar-core.version}</version>
             </dependency>
             <dependency>
+                <groupId>${tinkar-core.group.id}</groupId>
+                <artifactId>integration</artifactId>
+                <version>${tinkar-core.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>dev.ikm.tinkar.data</groupId>
                 <artifactId>tinkar-starter-data</artifactId>
                 <version>${tinkar-starter-data.version}</version>

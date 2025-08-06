@@ -28,6 +28,7 @@ public abstract class TinkarMojo extends AbstractMojo implements Runnable {
 	@Parameter(readonly = true, defaultValue = "${plugin.artifacts}")
 	protected List<Artifact> pluginDependencies;
 
+	@Isolate
 	@Parameter(name = "targetDir", defaultValue = "${project.build.directory}")
 	public File targetDir;
 

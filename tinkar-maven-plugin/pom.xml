@@ -45,6 +45,10 @@
         </dependency>
         <dependency>
             <groupId>${tinkar-core.group.id}</groupId>
+            <artifactId>integration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${tinkar-core.group.id}</groupId>
             <artifactId>reasoner-elk-owl</artifactId>
         </dependency>
         <dependency>

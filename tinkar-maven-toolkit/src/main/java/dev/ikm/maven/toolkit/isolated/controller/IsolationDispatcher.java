@@ -2,6 +2,8 @@ package dev.ikm.maven.toolkit.isolated.controller;
 
 import dev.ikm.maven.toolkit.TinkarMojo;
 import dev.ikm.maven.toolkit.isolated.entity.LogInstant;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,7 @@ public class IsolationDispatcher {
 	private String canonicalName;
 	private Path isolatedDirectory;
 	private final Semaphore semaphore = new Semaphore(2);
+	public static final int VERIFY_EXIT_CODE = 1;
 
 	private IsolationDispatcher(Builder builder) {
 		this.tinkarMojo = builder.tinkarMojo;
@@ -47,7 +50,7 @@ public class IsolationDispatcher {
 	/**
 	 * Dispatch new instance of JVM and run Mojo
 	 */
-	public void dispatch() {
+	public void dispatch() throws MojoExecutionException, MojoFailureException  {
 		isolationFieldSerializer.discoverIsolatedFields(tinkarMojo);
 		isolationFieldSerializer.serializeFields();
 
@@ -74,7 +77,9 @@ public class IsolationDispatcher {
 			logInstants.sort(Comparator.comparing(LogInstant::instant));
 			logInstants.forEach(logInstant -> LOG.info(logInstant.message()));
 			LOG.info("Process exited with code: " + exitCode);
-
+			if (exitCode == VERIFY_EXIT_CODE) {
+				throw new MojoExecutionException("Mojo Failed to Execute");
+			}
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
 		}
