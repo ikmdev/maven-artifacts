@@ -11,6 +11,8 @@ Architecture Team
 Required for running this:
 
 1. Download and install Java 23 (Azul)
+2. Download and install Maven 3.9.11
+3. Download and install Git
 
 ## Building and Running
 
