@@ -54,12 +54,15 @@ public class IsolationDispatcher {
 		isolationFieldSerializer.discoverIsolatedFields(tinkarMojo);
 		isolationFieldSerializer.serializeFields();
 
+		long maxMemory = Runtime.getRuntime().maxMemory();
+		long maxInMB = maxMemory / 1024 / 1024;
 		ProcessBuilder pb = new ProcessBuilder();
 		List<String> command = new ArrayList<>();
 		command.add(System.getProperty("java.home") + "/bin/java");
 		command.add("-Dfile.encoding=UTF-8");
 		command.add("-Dsun.stdout.encoding=UTF-8");
 		command.add("-Dsun.stderr.encoding=UTF-8");
+		command.add("-Xmx"+maxInMB+"m");
 		command.add("-cp");
 		command.add(classPath);
 		command.add(canonicalName);
