@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>dev.ikm.maven.tinkar</groupId>
 		<artifactId>maven-artifacts</artifactId>
-		<version>1.34.0-SNAPSHOT</version>
+		<version>1.34.0-IKDT-1112-Update-max-heap-size-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>tinkar-maven-toolkit</artifactId>
