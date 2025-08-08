@@ -113,7 +113,7 @@ public class VerifyPBExport extends TinkarMojo {
 
 		if (failed) {
 			LocalTime localTime = LocalTime.now();
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HHmmss");
 
 			String reportFile = targetDir + File.separator + "FailedVerifyPBExportReport" + dateTimeFormatter.format(localTime) + ".txt";
 

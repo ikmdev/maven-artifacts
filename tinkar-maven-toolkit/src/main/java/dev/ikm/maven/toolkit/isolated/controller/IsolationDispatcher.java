@@ -177,12 +177,12 @@ public class IsolationDispatcher {
 			//Build Class Path string based on dependencies
 			StringBuilder cpBuilder = new StringBuilder();
 			String targetDirectory = buildDirectory.resolve("classes").toString();
-			cpBuilder.append(targetDirectory).append(":");
+			cpBuilder.append(targetDirectory).append(File.pathSeparator);
 			for (int i = 0; i < dependencies.size(); i++) {
 				File dependency = dependencies.get(i);
 				String artifactPath = dependency.getAbsolutePath();
 				if (i < dependencies.size() - 1) {
-					cpBuilder.append(artifactPath).append(":");
+					cpBuilder.append(artifactPath).append(File.pathSeparator);
 				} else {
 					cpBuilder.append(artifactPath);
 				}
@@ -194,7 +194,7 @@ public class IsolationDispatcher {
 
 			//Create a directory for isolated fields
 			LocalTime localTime = LocalTime.now();
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HHmmss");
 			isolatedDirectory = Path.of(buildDirectory.toString(), tinkarMojo.getClass().getSimpleName() + "-" + dateTimeFormatter.format(localTime));
 			try {
 				Files.createDirectories(isolatedDirectory);
